@@ -5,7 +5,26 @@ Most recent entries at the top.
 
 ---
 
-## 2026-06-29 — Step 4 Build Complete
+## 2026-06-30 — Deployment Complete, Branches Synced
+
+**Repo:** https://github.com/bidhya/polenet (private)  
+**Live URL:** https://monumental-dieffenbachia-d72518.netlify.app/  
+**Branches:** `main` and `dev` in sync; `main` paused from auto-deploy until launch
+
+**URL cleanup applied (3 rounds of fixes):**
+- Stripped `srcset` attributes (responsive hints pointing to dead server)
+- Stripped WordPress video blocks (`.mov`/`.mp4` — never archived)
+- Stripped comment avatars (gstatic, gravatar — useless on static site)
+- Fixed `clean_html()` regex for multi-level wp-content paths (`2024/12/file.jpg`)
+- Unwrapped `<a href>` wrappers around images in blog posts
+- Stripped Wayback Machine wrappers from all external `href` links
+- Fixed duplicate `replace()` bug causing `../../../images/` triple-depth paths
+
+**Security audit:** no credentials, API keys, or secrets found. Akismet nonces and WordPress comment forms stripped from 11 blog/training pages.
+
+**Pending:** colleague review of live site content; polenet.org domain connection when ready.
+
+---
 
 **Script:** `scraper/build_site.py`  
 **Output:** `site/` (75 HTML files, 162 images, 21 MB total)

@@ -74,9 +74,19 @@ site/
 - [x] Generate all pages from archived HTML content
 - [x] Copy 162 images → `site/images/`
 - [x] Add GLightbox to photos page (77 images)
-- [ ] **NEXT: Local browser review — check all pages, nav links, images**
-- [ ] Fix any rendering issues found during review
-- [ ] Deploy to Netlify
+- [x] Deploy to Netlify — live at https://monumental-dieffenbachia-d72518.netlify.app/
+- [x] Security audit — strip Akismet nonces, WordPress comment forms, gstatic avatars
+- [x] URL cleanup — fix broken polenet.org/wp-content image refs, Wayback wrappers, srcset, video blocks
+- [x] Fix image path depth bug in blog/training pages (../../images/ not ../../../images/)
+- [x] Set up GitHub private repo (https://github.com/bidhya/polenet), main + dev branches
+- [x] Configure Netlify CI/CD: dev branch auto-deploys; main branch paused until launch
+- [x] Merge dev → main (branches synced)
+
+## STEP 5 — Review & Launch [TODO]
+- [ ] Colleague review of live site — flag content gaps or corrections
+- [ ] Check publications page formatting
+- [ ] Connect custom domain polenet.org in Netlify (DNS config)
+- [ ] Unpause main branch deploy in Netlify to go live
 
 ### 4c — Build output (generated 2026-06-29)
 ```

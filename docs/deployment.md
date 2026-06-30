@@ -88,17 +88,17 @@ __pycache__/
 - [x] Confirm repo created at github.com — https://github.com/bidhya/polenet (private)
 - [x] `git init`, single clean initial commit, `git remote add origin`, push `main`
 - [x] Create `dev` branch, push — both branches live on remote
-- [ ] **NEXT: Connect Netlify to GitHub repo**
-  - Log in at netlify.com
-  - "Add new site" → "Import from Git" → GitHub
-  - Select the `bidhya/polenet` repo
-  - Branch to deploy: `dev`
-  - Publish directory: `site`
-  - Build command: *(leave blank)*
-  - Click "Deploy site"
-- [ ] In Netlify: Site settings → Build & deploy → "main" context → Stop auto publishing (locks production)
-- [ ] Verify dev preview URL is working (share with colleague for review)
-- [ ] (Later) Connect polenet.org custom domain when ready to launch
+- [x] Connect Netlify to GitHub repo (`dev` branch, publish dir `site`, no build command)
+- [x] Netlify `dev` deploy live — https://monumental-dieffenbachia-d72518.netlify.app/
+- [x] `main` branch left paused (no auto-deploy until launch)
+- [x] Security audit complete — no credentials, stripped WordPress noise
+- [x] URL cleanup complete — no broken image refs, no Wayback wrappers
+- [x] Merge `dev` → `main` — branches in sync
+- [ ] **NEXT: Colleague review of live site**
+- [ ] Connect polenet.org custom domain when ready to launch
+  - In Netlify: Domain management → Add custom domain → polenet.org
+  - Update DNS A/CNAME at registrar to point to Netlify
+  - Unpause `main` branch deploy in Netlify
 
 ---
 
