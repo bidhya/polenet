@@ -1,0 +1,5 @@
+[build]
+  publish = "site"
+
+[context.dev]
+  publish = "site"

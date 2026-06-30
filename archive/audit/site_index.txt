@@ -1,0 +1,57 @@
+polenet.org ARCHIVE — MONITORING SITE INDEX
+============================================================
+
+Station     Title                                Coordinates                   Installed
+──────────  ───────────────────────────────────  ────────────────────────────  ────────────────────
+            Photos                                                             
+            Photos- People                                                     
+            Photos- in the Field                                               
+            Photos- Scenery                                                    
+BACK        Backer Island                        S 74.4304, W 102.478          2011-2012 season
+BENN        Bennett Nunatak                      S 84.7865, W 116.46           2010-2011 season
+BERP        Bear Peninsula                       S 74.5459, W 111.885          2010-2011 season
+BRIP        Brimstone Peak                       S 75.7957, E 158.4691         2007-2008 season
+BUMS        Mount Bumstead                       S 85.961, E 174.498           2013-2014 season
+BURI        Butcher Ridge                        S 79.1474, E 155.8942         2007-2008 season
+BYRD        Byrd Camp                            S 80.0169, W 119.4732         2009-2010 season
+CLRK        Clark Mountains                      S 77.3401, W 141.874          2009-2010 season
+COTE        Mount Coates                         S 77.8059, E 161.9978         2007-2008 season
+CRDI        Cordiner Peak                        S 82.8615, W 53.1991          2007-2008 season
+DEVI        Deverall Island                      S 81.4767, E 161.9771         2008-2009 season
+FALL        Fallone Nunatak                      S 85.3064, W 143.632          2009-2010 season
+FISH        Fishtail Point                       S 78.9277, E 162.5647         2008-2009 season
+FLM5        Mount Fleming                        S 77.5327, E 160.2714         2006-2007 season
+FRKI, FIE0  Franklin Island                      S 76.1643, E 168.3817         2010-2011 season
+HAAG        Haag Nunatak                         S 77.038, W 78.2871           2007-2008 season
+HOWE        Mount Howe                           S 87.4157, W 149.434          2009-2010 season
+HOWN        Howard Nunatak                       S 77.528, W 86.7673           2007-2008 season
+IGGY        Iggy Ridge                           S 83.3072, E 156.2498         2009-2010 season
+INMN        Inman Nunatak                        S 74.8209, W 98.8805          2012-2013 season
+KHLR        Kohler Glacier                       S 76.1546, W 120.729          2009-2010 season
+LTHW        Lower Thwaites Glacier               S 76.4583, W 107.782          2009-2010 season
+LWN0        Lonewolf Nunatak                     S 81.3459, E 152.7316         2006-2007 season
+MCAR        Mount Carbone                        S 76.3222, W 144.304          2009-2010 season
+MIN0        Minna Bluff                          S 78.6503, E 167.1637         2006-2007 season
+PATN        Mount Paterson                       S 78.03, W 155.023            2009-2010 season
+PECE        Pecora Escarpment                    S 85.6119, W 68.5564          2007-2008 season
+PIRT        Pirrit Hills                         S 81.1032, W 85.1426          2013-2014 season
+RAMG        Ramsey Glacier                       S 84.3384, E 178.0471         2007-2008 season
+RMBO        Rambo Nunataks                       S 83.8732, W 66.3938          2013-2014 season
+ROB4        Cape Roberts                         S 77.0344, E 163.1901         2006-2007 season
+SDLY        Mount Sidley                         S 77.1353, W 125.975          2009-2010 season
+SIPL        Siple Dome                           S 81.6405, W 148.955          2009-2010 season
+STEW        Stewart Hills                        S 84.1870, W 86.2473          2013-2014 season
+SUGG        Mount Suggs                          S 75.2806, W 72.1801          2007-2008 season
+SURP        Cape Surprise                        S 84.7199, W 171.202          2007-2008 season
+THUR        Thurston Island                      S 72.5301, W 97.5596          2010-2011 season
+TOMO        Toney Mountain                       S 75.8019, W 114.662          2011-2012 season
+UNGL        Union Glacier                        S 79.7747, W 82.524           2010-2011 season
+UTHW        Upper Thwaites Glacier               S 77.5821, W 109.044          2009-2010 season
+WAIS        WAIS Divide                          S 79.4181, W 111.778          2009-2010 season
+WHN0        Westhaven Nunatak                    S 79.8457, W 154.2201         2006-2007 season
+WHTM        Whitmore Mountains                   S 82.6832, W 104.393          2009-2010 season
+WILN        Wilson Nunatak                       S 80.0398, W 80.5579          2007-2008 season
+WLCT        Mount Walcott                        S 85.3692, W 87.3925          2013-2014 season
+WWAY        Whichaway Nunataks                   S 81.5770, W 28.4027          2013-2014 season
+
+Total monitoring sites: 50

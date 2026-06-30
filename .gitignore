@@ -1,0 +1,14 @@
+# Raw Wayback Machine downloads — large, re-creatable, not needed in git
+archive/html/
+archive/images/
+archive/assets/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,43 @@
+polenet.org ARCHIVE — GAP REPORT & DECISIONS NEEDED
+============================================================
+
+WHAT WE HAVE
+────────────────────────────────────────
+  Nav pages           : 7/7
+  Monitoring sites    : 50
+  Blog posts          : 18
+  Training schools    : 6
+  Gallery pages       : 4/5
+  Images on disk      : 162
+  Missing images      : 170
+
+DECISIONS NEEDED BEFORE REBUILD
+────────────────────────────────────────
+  1. Individual site pages (50 pages) — rebuild as individual pages
+     or consolidate into a table on the Sites and Data page?
+
+  2. Blog posts — include all, or only recent (post-2020)?
+
+  3. Photo gallery — CSS grid + lightbox (recommended)
+     or match the original 5-page paginated layout?
+
+  4. Hosting — affects URL structure and relative paths.
+
+NOISE (will be excluded from rebuild)
+────────────────────────────────────────
+  2010-10.html
+  2010-11.html
+  2010-12.html
+  2011-01.html
+  2014-03.html
+  2014-07.html
+  2014-12.html
+  2015-09.html
+  2016-09.html
+  2024-10.html
+  2024-11.html
+  category-uncategorized.html
+  comments-feed.html
+  feed.html
+  homepage_20251207055143.html
+  wp-login-php.html

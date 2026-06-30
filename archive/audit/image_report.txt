@@ -1,0 +1,362 @@
+polenet.org ARCHIVE — IMAGE COVERAGE REPORT
+============================================================
+
+Images on disk      : 162
+Unique images ref'd : 331
+Missing from disk   : 170
+
+MISSING IMAGES (referenced in HTML but not downloaded):
+────────────────────────────────────────────────────────────
+  1506080_10152180626761941_1580586737_o.jpg
+    ← feed.html
+    ← heading-south-to-head-home-by-eric-kendrick.html
+  1522735_10152178247276941_567076417_o.jpg
+    ← feed.html
+    ← wilson-nunatak-maintenance-vist-by-eric-kendrick.html
+  1524288_10152178248506941_459776716_o.jpg
+    ← feed.html
+    ← wilson-nunatak-maintenance-vist-by-eric-kendrick.html
+  1606224_10152178194076941_1153381237_o.jpg
+    ← howard-nunatak-vist-by-eric-kendrick.html
+  1622334_10152178200016941_1627275253_o.jpg
+    ← howard-nunatak-vist-by-eric-kendrick.html
+  1795378_10152178201196941_1949503769_o.jpg
+    ← howard-nunatak-vist-by-eric-kendrick.html
+  2024-2025_FinalFieldProgressMap_09Jan-1024x806.jpg
+    ← 2024-2025-field-season-progress.html
+  21Dec-Sat-Image.png
+    ← 2024-2025-field-season-progress.html
+  3f18862d766753c4a0375f3f21870a84bdae6d0421b20ee9d3f2ff5c155d6232
+    ← howard-nunatak-vist-by-eric-kendrick.html
+  43edd656-1a42-487b-a401-203ecd044702-1-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  520c3fd4-b28d-4bbe-88e5-b6c1668437e2-1-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  ALE-Christmas-dinner-2024_Whetu-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Another-flight-cancellation-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  BENN-1024x682.jpg
+    ← home-page-id-1758.html
+  BENN_seismic-1024x681.jpg
+    ← home-page-id-1758.html
+  Buried-GLDK-seismic-on-arrival_Troy-1024x536.jpeg
+    ← 2024-2025-field-season-progress.html
+  Crevasse-rescue-training-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  CryoSeis_banner_toplogos_additional.jpg
+    ← 2017-glacial-seismology-training-school.html
+  Cutting-ice-THUR-seismic_Sobrero-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  DSC06759-1-1024x683.jpg
+    ← 2025-gia-workshop.html
+  David_talking_to_students.jpg
+    ← feed.html
+    ← sharing-science-by-david-saddler.html
+  Digging-out-GLDK-seismic_Troy-887x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Digging-out-GPS-cable-SLTR-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Digging-out-MRTP-seismic-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  En-route-to-UNGL-site-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Erica-in-soccer-game-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Field-team-minus-Mark-UNGL-site-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  First-equipment-cargo-load-1024x730.jpeg
+    ← 2024-2025-field-season-progress.html
+  Flat-White-Cache-2-1024x173.jpeg
+    ← 2024-2025-field-season-progress.html
+  Gould-GNSS-on-departure_Sobrero-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Grabbing-the-seismic-data_Sobrero-2-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Hauling-gear-Mt-Sidley_Normandeau_Sobrero-1024x765.jpeg
+    ← 2024-2025-field-season-progress.html
+  Hauling-to-GLDK-GNSS_sobrero-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Holiday-Cheer_Sobrero-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  IMG-20241210-WA0003-768x1024.jpg
+    ← 2024-2025-field-season-progress.html
+  IMG-20241210-WA0011-768x1024.jpg
+    ← 2024-2025-field-season-progress.html
+  IMG_1765.jpeg
+    ← 2017-glacial-seismology-training-school.html
+  IMG_2538-522x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Jim-servicing-MTAK-seismic_Kelly-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Jim_Erica_Bob_Franco-1024x768.jpeg
+    ← feed.html
+    ← field-season-training-by-david-saddler.html
+  KBA-New-Year-Cave-1024x264.jpeg
+    ← 2024-2025-field-season-progress.html
+  Killing-Time-in-Punta-Arenas-with-Coffee-1024x361.jpg
+    ← 2024-2025-field-season-progress.html
+  LPLY-Working-in-the-pit-as-snow-drifts-Jim-under-coat-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  LPLY-very-icey-GPS-875x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Last-supper-after-last-site-completed-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  MCRG-before-and-after-1024x656.jpg
+    ← 2024-2025-field-season-progress.html
+  MCRG-fly-by-1024x675.jpeg
+    ← 2024-2025-field-season-progress.html
+  MCRG-skua-inspections-1024x576.jpg
+    ← 2024-2025-field-season-progress.html
+  MRTP-seismic-2023-vs-2024-1024x576.jpg
+    ← 2024-2025-field-season-progress.html
+  Mission-accomplished-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  No-Fly-746x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  No-Talent-Show-2024_Sobrero-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  PHOTO-2024-11-12-17-10-18.jpeg
+    ← 2024-2025-field-season-progress.html
+  Picture1.png
+    ← 2017-glacial-seismology-training-school.html
+  Prepping-battery-replacements-BACK_GriffinKelly_Erica_Franco-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Pulling-seismic-enclosure-out_Sobrero-1024x576.jpeg
+    ← 2024-2025-field-season-progress.html
+  Punta-Last-Supper-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Refueling-at-Cache-2-858x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Servicing-BACK_photo_credit_Erica_Lucas-1024x559.jpeg
+    ← 2024-2025-field-season-progress.html
+  Servicing-MRTP-GPS-1024x372.jpeg
+    ← 2024-2025-field-season-progress.html
+  Servicing-UNGL-seismic_7Dec24-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Servicing-seismic-THUR_Bayou-1024x683.jpeg
+    ← 2024-2025-field-season-progress.html
+  Sidley-Landing-and-Sites-1024x788.jpg
+    ← 2024-2025-field-season-progress.html
+  Sidley-site_Troy-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  Synoptic-Weather-Model-2024122700.mbland.700.hr18.jpg
+    ← 2024-2025-field-season-progress.html
+  Taco_and_Peter.jpg
+    ← home-page-id-812.html
+  Team-at-Backer-Island_photo_credit_Nicolas_Bayou-1024x448.jpeg
+    ← 2024-2025-field-season-progress.html
+  Team-bringing-in-2025-1024x682.jpeg
+    ← 2024-2025-field-season-progress.html
+  Terry-ALE-lecture-2-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  UPTW-seismic-on-arrival_Normandeau-768x1024.jpg
+    ← 2024-2025-field-season-progress.html
+  UTHW-GPS-on-arrival_Sobrero-1024x768.jpg
+    ← 2024-2025-field-season-progress.html
+  Union_Glacier_stitch.jpg
+    ← home-page-id-821.html
+  View-of-frozen-Pine-Island-Bay-from-Backer-1024x699.jpeg
+    ← 2024-2025-field-season-progress.html
+  WhatsApp-Image-2024-12-01-at-19.34.49-1024x786.jpeg
+    ← 2024-2025-field-season-progress.html
+  Whetu-1-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  Xmas-cookie-2024-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  f67d5afe052e523b48c689cbbe126e70c772f14c26081394639d7f4c7e94152b
+    ← howard-nunatak-vist-by-eric-kendrick.html
+  fa573912-af88-41f7-a09c-d96b177c5734-1-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  fbf9ebd1-dca8-4cf8-9a49-7d72cfff9511-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  fcaa1677ff62ccac4fdbe1c6598fbfbc795e283c298defb260e311d0e77a39d1
+    ← howard-nunatak-vist-by-eric-kendrick.html
+  ff281873-89a7-4db7-8aaa-54a2e372a935-1-768x1024.jpeg
+    ← 2024-2025-field-season-progress.html
+  gould_GPS.jpg
+    ← gould-knoll.html
+  gould_seismic.jpg
+    ← gould-knoll.html
+  group_photo-1024x705.jpeg
+    ← 2024-2025-field-season-progress.html
+  ice-climbing-excursion_Sobrero-1024x728.jpeg
+    ← 2024-2025-field-season-progress.html
+  lepley_GPS.jpg
+    ← lepley-nunatak.html
+  lepley_seismic.jpg
+    ← lepley-nunatak.html
+  mail
+    ← feed.html
+    ← iris-intern.html
+  martin_GPS.jpg
+    ← martin-peninsula.html
+  martin_seismic.jpg
+    ← martin-peninsula.html
+  miller_GPS.jpg
+    ← miller-crag.html
+  miller_seismic.jpg
+    ← miller-crag.html
+  new-GNSS-cable-SLTR-1024x627.jpeg
+    ← 2024-2025-field-season-progress.html
+  shattered-solar-panels-at-Sidley_Sobrero-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  slater_rocks.jpg
+    ← slater-rocks-2.html
+  students_ECW_gear.jpg
+    ← feed.html
+    ← sharing-science-by-david-saddler.html
+  students_touching_volcanic_bomb.jpg
+    ← feed.html
+    ← sharing-science-by-david-saddler.html
+  takahe_GPS.jpg
+    ← mt-takahe.html
+  takahe_seismic.jpg
+    ← mt-takahe.html
+  team-Xmas-dinner-1024x768.jpeg
+    ← 2024-2025-field-season-progress.html
+  thumbnail_image001-1-768x1024.jpg
+    ← 2025-gia-workshop.html
+  thumbs_2010_jeremyminer_bear.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_2011_davesaddler_backer.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_2011_davesaddler_mtsidley.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_2011_ellieboyce_paterson.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_2011_ellieboyce_toney.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_2011_ellieboyce_toney2.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_20180125_084207.jpg
+    ← home-page-id-821.html
+  thumbs_37_p1134148.jpg
+    ← photos-nggallery-page-3.html
+  thumbs_39_p1144158.jpg
+    ← photos-nggallery-page-3.html
+  thumbs_40_p1154348.jpg
+    ← photos-nggallery-page-3.html
+  thumbs_41_p1154355.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_42_p1184625.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_43_p1194788.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_44_p1194813.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_45_p1264998.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_46_p1275081.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_47_p1275085.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_48_p1285233.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_49_pc293444.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_50_pc293484.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_51_pc293492.jpg
+    ← photos-nggallery-page-4.html
+  thumbs_carbone2.jpg
+    ← home-page-id-821.html
+  thumbs_dsc_5612.jpg
+    ← home-page-id-827.html
+  thumbs_dsc_6069.jpg
+    ← home-page-id-812.html
+  thumbs_dsc_6070.jpg
+    ← home-page-id-827.html
+  thumbs_dsc_6072.jpg
+    ← home-page-id-827.html
+  thumbs_dsc_6077.jpg
+    ← home-page-id-821.html
+  thumbs_dsc_6095.jpg
+    ← home-page-id-827.html
+  thumbs_dscn2228.jpg
+    ← home-page-id-827.html
+  thumbs_dscn2311.jpg
+    ← home-page-id-827.html
+  thumbs_dscn2392.jpg
+    ← home-page-id-812.html
+  thumbs_dscn2408.jpg
+    ← home-page-id-821.html
+  thumbs_dscn2429.jpg
+    ← home-page-id-827.html
+  thumbs_dscn2760.jpg
+    ← home-page-id-821.html
+  thumbs_dscn2767.jpg
+    ← home-page-id-821.html
+  thumbs_dscn2770.jpg
+    ← home-page-id-821.html
+  thumbs_dscn3335.jpg
+    ← home-page-id-827.html
+  thumbs_dscn3584.jpg
+    ← home-page-id-827.html
+  thumbs_img_0240.jpg
+    ← home-page-id-812.html
+  thumbs_img_0324-2.jpg
+    ← home-page-id-812.html
+  thumbs_img_0335.jpg
+    ← home-page-id-812.html
+  thumbs_img_0426.jpg
+    ← home-page-id-812.html
+  thumbs_img_0508.jpg
+    ← home-page-id-812.html
+  thumbs_img_0559.jpg
+    ← home-page-id-812.html
+  thumbs_img_0564.jpg
+    ← home-page-id-827.html
+  thumbs_img_0573.jpg
+    ← home-page-id-821.html
+    ← home-page-id-821.html
+  thumbs_img_0576-2.jpg
+    ← home-page-id-812.html
+  thumbs_img_0592.jpg
+    ← home-page-id-812.html
+  thumbs_img_0593.jpg
+    ← home-page-id-812.html
+  thumbs_img_0905.jpg
+    ← home-page-id-827.html
+  thumbs_img_0924.jpg
+    ← home-page-id-821.html
+  thumbs_img_1389.jpg
+    ← home-page-id-821.html
+  thumbs_img_1395.jpg
+    ← home-page-id-821.html
+  thumbs_img_1817.jpg
+    ← home-page-id-812.html
+  thumbs_img_2448.jpg
+    ← home-page-id-821.html
+  thumbs_img_2475.jpg
+    ← home-page-id-821.html
+  thumbs_img_2476.jpg
+    ← home-page-id-827.html
+  thumbs_img_2625.jpg
+    ← home-page-id-812.html
+  thumbs_img_2766.jpg
+    ← home-page-id-821.html
+  thumbs_img_5943.jpg
+    ← home-page-id-821.html
+  thumbs_img_6043.jpg
+    ← home-page-id-821.html
+  thumbs_new-GNSS-cable-SLTR.jpeg
+    ← photos.html
+  thumbs_p1010488.jpg
+    ← home-page-id-821.html
+  thumbs_p1010563.jpg
+    ← home-page-id-812.html
+  thumbs_p1010575.jpg
+    ← home-page-id-812.html
+  thumbs_p1010600.jpg
+    ← home-page-id-812.html
+  thumbs_p1010652.jpg
+    ← home-page-id-821.html
+  thumbs_p1010653.jpg
+    ← home-page-id-812.html
+  thumbs_p1010710.jpg
+    ← home-page-id-821.html
+
+IMAGES ON DISK NOT REFERENCED IN ANY PAGE:
+────────────────────────────────────────────────────────────
+  img_6a7573d6
