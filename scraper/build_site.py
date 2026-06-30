@@ -180,8 +180,9 @@ def clean_html(el) -> str:
         html
     )
     # Rewrite polenet.org/wp-content/uploads/ image srcs to local images/
+    # Use [^"]+ to match any number of subdirectory levels (e.g. 2024/12/filename.jpg)
     html = re.sub(
-        r'src="https?://(?:www\.)?polenet\.org/wp-content/uploads/(?:[^"]*?/)?([^/"]+\.[a-zA-Z]{3,4})(?:\?[^"]*?)?"',
+        r'src="https?://(?:www\.)?polenet\.org/wp-content/uploads/(?:[^"]+/)*([^/"]+\.[a-zA-Z]{3,4})(?:\?[^"]*?)?"',
         lambda m: f'src="images/{m.group(1)}"',
         html
     )
@@ -244,7 +245,13 @@ def page_text(soup: BeautifulSoup, el) -> str:
         # Internal polenet.org links → relative path
         m = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/https?://(?:www\.)?polenet\.org(/[^"]*)', href)
         if m:
-            a["href"] = m.group(1)
+            internal_path = m.group(1)
+            # If this <a> wraps only an <img> and links to a wp-content image, unwrap it
+            children = [c for c in a.children if str(c).strip()]
+            if len(children) == 1 and getattr(children[0], 'name', None) == 'img' and '/wp-content/' in internal_path:
+                a.unwrap()
+            else:
+                a["href"] = internal_path
             continue
         # External links still wrapped in Wayback → unwrap to real URL
         m2 = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/(https?://.*)', href)
