@@ -569,7 +569,6 @@ def build_training_schools():
             el    = main_content(ts)
             inner = page_text(ts, el)
             inner = re.sub(r'\.\./images/', '../../images/', inner)
-            inner = inner.replace("../images/", "../../images/")
             t = ts.title.text if ts.title else label
             t = re.sub(r'\s*\|.*$', '', t).strip()
             bdy = f"""
@@ -600,7 +599,6 @@ def build_blog():
             el   = main_content(bs)
             inner = page_text(bs, el)
             inner = re.sub(r'\.\./images/', '../../images/', inner)
-            inner = inner.replace("../images/", "../../images/")
             excerpt_el = bs.select_one(".entry-content p, .post-content p")
             excerpt = excerpt_el.get_text(strip=True)[:200] + "…" if excerpt_el else ""
 
