@@ -83,20 +83,21 @@ __pycache__/
 ## Setup steps (one-time)
 
 - [x] Write deployment plan (this file)
-- [ ] Create `.gitignore` locally
-- [ ] Create `netlify.toml` locally
-- [ ] Confirm repo created at github.com (user creates the repo)
-- [ ] `git init`, `git remote add origin`, push `main`
-- [ ] Create `dev` branch, push
-- [ ] Connect Netlify to GitHub repo
+- [x] Create `.gitignore` locally
+- [x] Create `netlify.toml` locally
+- [x] Confirm repo created at github.com — https://github.com/bidhya/polenet (private)
+- [x] `git init`, single clean initial commit, `git remote add origin`, push `main`
+- [x] Create `dev` branch, push — both branches live on remote
+- [ ] **NEXT: Connect Netlify to GitHub repo**
   - Log in at netlify.com
   - "Add new site" → "Import from Git" → GitHub
-  - Select the polenet repo
-  - Branch: `dev`, Publish directory: `site`
-  - No build command
-  - Deploy site
-- [ ] In Netlify: go to `main` branch deploys → Pause / lock production deploy
-- [ ] Verify dev preview URL is working
+  - Select the `bidhya/polenet` repo
+  - Branch to deploy: `dev`
+  - Publish directory: `site`
+  - Build command: *(leave blank)*
+  - Click "Deploy site"
+- [ ] In Netlify: Site settings → Build & deploy → "main" context → Stop auto publishing (locks production)
+- [ ] Verify dev preview URL is working (share with colleague for review)
 - [ ] (Later) Connect polenet.org custom domain when ready to launch
 
 ---

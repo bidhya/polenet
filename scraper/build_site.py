@@ -179,6 +179,12 @@ def clean_html(el) -> str:
         'http://',
         html
     )
+    # Rewrite polenet.org/wp-content/uploads/ image srcs to local images/
+    html = re.sub(
+        r'src="https?://(?:www\.)?polenet\.org/wp-content/uploads/(?:[^"]*?/)?([^/"]+\.[a-zA-Z]{3,4})(?:\?[^"]*?)?"',
+        lambda m: f'src="images/{m.group(1)}"',
+        html
+    )
     # Remove Wayback banner scripts/styles
     html = re.sub(r'<script[^>]*web-static\.archive\.org[^>]*>.*?</script>', '', html, flags=re.DOTALL)
     return html
@@ -190,6 +196,11 @@ def page_text(soup: BeautifulSoup, el) -> str:
         return "<p>Content not available.</p>"
     # Remove known WP noise inside content
     for tag in el.find_all(class_=re.compile("sharedaddy|wpcnt|post-nav|post-footer|comments|wp-block-comment")):
+        tag.decompose()
+    # Remove video blocks — videos were not archived and won't load
+    for tag in el.find_all(class_=re.compile("wp-block-video", re.I)):
+        tag.decompose()
+    for tag in el.find_all("video"):
         tag.decompose()
     # Remove WordPress comment form, Akismet fields, and respond section
     for tag in el.find_all(id=re.compile("respond|comments|akismet", re.I)):
@@ -209,8 +220,15 @@ def page_text(soup: BeautifulSoup, el) -> str:
         else:
             tag.decompose()
     # Fix image src attributes (strip Wayback wrapper, fix relative paths)
+    # Also strip srcset — we use single images, not responsive sets
     for img in el.find_all("img"):
+        img.attrs.pop("srcset", None)
+        img.attrs.pop("sizes", None)
         src = img.get("src", "")
+        # Remove useless external images (comment avatars, mail embeds)
+        if any(x in src for x in ["gstatic.com", "gravatar.com", "mail.google.com", "wp-includes/images/smilies"]):
+            img.decompose()
+            continue
         m = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/https?://[^/]+(/wp-content/uploads/.+?)(?:\?|$)', src)
         if m:
             fname = Path(m.group(1)).name.split("?")[0]
@@ -220,13 +238,18 @@ def page_text(soup: BeautifulSoup, el) -> str:
             fname = Path(src).name.split("?")[0]
             img["src"] = f"../images/{fname}"
             img["loading"] = "lazy"
-    # Fix internal anchor hrefs
+    # Fix anchor hrefs — strip Wayback wrapper from all links
     for a in el.find_all("a", href=True):
         href = a["href"]
-        # Strip Wayback wrapper
-        m = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/https?://polenet\.org(/[^"]*)', href)
+        # Internal polenet.org links → relative path
+        m = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/https?://(?:www\.)?polenet\.org(/[^"]*)', href)
         if m:
             a["href"] = m.group(1)
+            continue
+        # External links still wrapped in Wayback → unwrap to real URL
+        m2 = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/(https?://.*)', href)
+        if m2:
+            a["href"] = m2.group(1)
     return el.decode_contents()
 
 
