@@ -3,6 +3,10 @@ archive/html/
 archive/images/
 archive/assets/
 
+# Internal docs / agent context — not needed in the deployed repo
+docs/
+AGENTS.md
+
 # Python
 __pycache__/
 *.pyc
