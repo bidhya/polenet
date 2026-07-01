@@ -79,3 +79,9 @@ You will act as a senior Python automation engineer and web developer. Continue 
 - Connect custom domain polenet.org in Netlify (DNS config)
 - Unpause `main` branch deploy to go live
 
+### GIT / DEPLOYMENT DISCIPLINE
+- Do NOT push every minor change to `dev` — batch related edits into one commit/push
+- Do NOT merge `dev` → `main` for small/incremental updates — only merge meaningful, reviewed milestones
+- Netlify free tier build credits are limited; frequent pushes/merges trigger unnecessary deploys
+- `netlify.toml` already skips deploys unless `site/` changed, but this is a safety net, not a substitute for batching pushes
+
