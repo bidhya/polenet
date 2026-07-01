@@ -18,33 +18,34 @@ All project documentation lives in `docs/`. Key files:
 | `docs/questions.md` | Open questions needing input — pick what to share | Colleague / Internal |
 | `docs/discovery-log.md` | Running log of findings and decisions, newest first | Colleague / Internal |
 | `docs/archive-analysis.md` | Why we chose Dec 2025 snapshot — clean explanation | Shareable with colleague |
+| `docs/deployment.md` | Deployment decisions, branch strategy, Netlify setup | Internal |
 
 ---
 
 ### SITE STRUCTURE (discovered)
 - 7 nav pages: Home, About, Sites and Data, Photos, Publications, Training Schools, Blog
-- ~51 individual monitoring site detail pages (station ID, coordinates, install dates)
-- ~17 blog posts and training school pages
-- 5-page photo gallery (NextGEN Gallery plugin — being replaced with clean HTML/CSS)
-- WordPress Aries theme (reference only — being discarded in rebuild)
+- 51 individual monitoring site detail pages (station ID, coordinates, install dates)
+- 11 blog posts (5 recent 2024 + 6 Eric Kendrick 2014 field diaries)
+- 6 training school pages (GIA 2015, 2017, 2019, 2023, 2025 workshop + 1 more)
+- 77-image photo gallery with GLightbox lightbox
 
 ### MY TECHNICAL STACK
 - IDE: VS Code
 - AI Assistant: GitHub Copilot
 - Language: Python 3
-- Output Target: Static site (HTML, CSS, JavaScript) with zero databases or PHP.
+- Output: Static site (HTML, CSS, JavaScript) — zero databases, zero PHP
+- Hosting: Netlify (free tier), GitHub private repo
 
 ### YOUR ROLE AS MY AI ARCHITECT
-You will act as a senior Python automation engineer and web scraper. You must guide me through this process sequentially, step-by-step.
+You will act as a senior Python automation engineer and web developer. Continue guiding me through improvements, content review, and eventual launch.
 
 ---
 
-### STEP 1: ARCHIVE DATA EXTRACTION SCRIPT — COMPLETE
+### STEP 1: ARCHIVE DATA EXTRACTION — COMPLETE
 - Script: `scraper/fetch_archive.py`
-- Queries the Wayback CDX API for the best snapshot in the Sept–Dec 2025 window
+- Queries Wayback CDX API, targets snapshot `20251207055143` (Dec 7, 2025)
 - Downloads homepage HTML → `archive/html/`
-- Downloads images from `<img>` tags → `archive/images/`
-- Result: 7 images + homepage HTML captured from snapshot `20251207055143`
+- Downloads images → `archive/images/`
 
 ### STEP 2: FULL SITE CRAWL — COMPLETE
 - Script: `scraper/crawl_site.py`
@@ -52,13 +53,29 @@ You will act as a senior Python automation engineer and web scraper. You must gu
 - 162 images and 74 CSS/JS assets downloaded
 - See `docs/discovery-log.md` for full findings
 
-### STEP 3: AUDIT — IN PROGRESS
-- Script: `scraper/audit.py` (to be written)
-- Inventory and classify all captured HTML files
-- Identify content gaps and missing images
-- Produce `archive/audit/gap_report.txt`
-- Key decisions needed: see `docs/questions.md`
+### STEP 3: AUDIT — COMPLETE
+- Script: `scraper/audit.py`
+- Classified 101 HTML files; produced page_inventory, image_report, gap_report
+- Generated `archive/audit/site_index.json` — 56 entries, 51 with valid station IDs
+- Reports in `archive/audit/`
 
-### STEP 4: REBUILD — TODO
-- Design clean static HTML/CSS layout based on archived content
-- No WordPress, no PHP, no database dependencies
+### STEP 4: REBUILD — COMPLETE
+- CSS: `site/css/style.css` — navy/blue palette, CSS variables, responsive
+- Builder: `scraper/build_site.py` — generates all pages from archived HTML
+- Output: 75 HTML files, 162 images, 21 MB total in `site/`
+- Security audit applied: stripped Akismet nonces, comment forms, broken image refs
+- URL cleanup: all Wayback wrappers removed, local image paths corrected
+
+### STEP 5: DEPLOYMENT — COMPLETE
+- GitHub: https://github.com/bidhya/polenet (private repo, `main` + `dev` branches)
+- Netlify: https://monumental-dieffenbachia-d72518.netlify.app/
+- CI/CD: push to `dev` → Netlify auto-deploys to preview URL
+- `main` branch: paused in Netlify until ready to connect polenet.org
+- See `docs/deployment.md` for full setup details
+
+### STEP 6: REVIEW & LAUNCH — NEXT
+- Colleague content review of live site
+- Fix any content gaps or corrections identified
+- Connect custom domain polenet.org in Netlify (DNS config)
+- Unpause `main` branch deploy to go live
+
