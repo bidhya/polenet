@@ -1,28 +1,18 @@
 #!/usr/bin/env python3
 """
-build_site.py — Step 4: Generate the static polenet.org website.
+build_site.py — Step 4/6: Generate the static polenet.org website.
 
-Reads archived HTML from archive/html/, extracts content,
-and writes clean static pages to site/.
+Reads from:
+  archive/html/     — Wayback Machine archived pages (fallback for some content)
+  archive/xml/      — WordPress WXR export JSON (primary source for posts, pages)
+  archive/audit/    — site_index.json (station metadata)
+
+Outputs:
+  site/             — full static site ready for Netlify
 
 Usage:
   python build_site.py
-
-Output structure:
-  site/
-    index.html
-    about.html
-    sites.html
-    photos.html
-    publications.html
-    training-schools.html
-    blog/
-      index.html
-      [post-slug].html  × 5 recent posts
-    sites/
-      [STATION].html    × 56 monitoring site pages
-    css/style.css       (already written separately)
-    images/             (copied from archive/images/)
+  (run scraper/parse_xml.py first to generate archive/xml/)
 """
 
 import re
@@ -41,27 +31,98 @@ BASE_DIR     = Path(__file__).resolve().parent.parent
 ARCHIVE_HTML = BASE_DIR / "archive" / "html"
 ARCHIVE_IMG  = BASE_DIR / "archive" / "images"
 AUDIT_DIR    = BASE_DIR / "archive" / "audit"
+XML_DIR      = BASE_DIR / "archive" / "xml"
 SITE_DIR     = BASE_DIR / "site"
 SITE_IMG     = SITE_DIR / "images"
 SITE_CSS     = SITE_DIR / "css"
 
 # ---------------------------------------------------------------------------
-# Blog posts to include (recent + notable)
+# XML data (populated in main)
 # ---------------------------------------------------------------------------
-BLOG_POSTS = [
-    "2024-2025-field-season-progress",
-    "field-season-preparations-by-david-saddler",
-    "field-season-training-by-david-saddler",
-    "sharing-science-by-david-saddler",
-    "greenland-gps-study-gnet-highlights-the-importance-of-a-dense-antarctic-gps-network",
-    # 2014 Eric Kendrick field diaries — optional, included for now
-    "heading-south-to-head-home-by-eric-kendrick",
-    "howard-nunatak-vist-by-eric-kendrick",
-    "wilson-nunatak-maintenance-vist-by-eric-kendrick",
-    "visit-to-butcher-ridge-by-eric-kendrick",
-    "installing-sites-in-northern-victoria-land-by-eric-kendrick",
-    "iris-intern",
+XML_PAGES: dict = {}  # slug → page dict
+XML_POSTS: list = []  # all published posts, chronological
+
+# Extra pages to build from XML (not in the main nav)
+# Each entry: (slug, title, nav_label_for_active_highlight)
+EXTRA_PAGES = [
+    ("in-the-news",                      "In the News",               "About"),
+    ("data",                             "Data",                      "Sites and Data"),
+    ("meet-the-researchers",             "Meet the Researchers",      "About"),
+    ("quick-facts",                      "Quick Facts",               "About"),
+    ("links",                            "Links",                     "About"),
+    ("2025-2026-field-season-progress-page", "2025-2026 Field Season Progress", "Blog"),
+    ("2024-2025-field-season-progress",  "2024-2025 Field Season Progress", "Blog"),
+    ("2023-2024-field-season-progress",  "2023-2024 Field Season Progress", "Blog"),
 ]
+
+# ---------------------------------------------------------------------------
+# XML helpers
+# ---------------------------------------------------------------------------
+
+# WordPress shortcodes (theme-specific) — strip on output
+_WP_SHORTCODE = re.compile(r'\[/?[a-zA-Z_][a-zA-Z0-9_-]*[^\]]*\]')
+# Internal polenet.org links that we know how to rewrite
+_POLENET_LINK = re.compile(
+    r'href="https?://(?:www\.)?polenet\.org/([^"/?#][^"/?#]*?)/?"'
+)
+_POLENET_HOME = re.compile(
+    r'href="https?://(?:www\.)?polenet\.org/?"'
+)
+
+
+def xml_to_html(content: str, depth: int = 0) -> str:
+    """
+    Prepare XML-parsed page/post content for use at a given site depth.
+
+    - depth=0: root pages (index.html, about.html, ...)
+    - depth=2: subdirectory pages (blog/x.html, sites/x.html, ...)
+
+    Actions:
+    - Rewrite src="images/..." and href="images/..." for the correct depth
+    - Strip WordPress shortcodes (e.g. [two_thirds], [/one_half])
+    - Rewrite internal polenet.org links to local relative paths
+    - Rewrite links to field-season progress pages, etc.
+    """
+    if not content:
+        return ''
+
+    prefix = '../' * depth
+
+    # Adjust image paths
+    if depth > 0:
+        content = content.replace('src="images/', f'src="{prefix}images/')
+        content = content.replace('href="images/', f'href="{prefix}images/')
+
+    # Strip WordPress shortcodes
+    content = _WP_SHORTCODE.sub('', content)
+
+    # Rewrite internal polenet.org links (slug/page-name form)
+    def rewrite_polenet_link(m):
+        raw_slug = m.group(1).rstrip('/')
+        return f'href="{prefix}{raw_slug}.html"'
+    content = _POLENET_LINK.sub(rewrite_polenet_link, content)
+    content = _POLENET_HOME.sub(f'href="{prefix}index.html"', content)
+
+    # Strip unresolvable ?page_id= links (leave dead, but clean href)
+    content = re.sub(r'href="https?://(?:www\.)?polenet\.org/\?[^"]*"', 'href="#"', content)
+    # Strip any remaining polenet.org links we couldn't resolve
+    content = re.sub(r'href="https?://(?:www\.)?polenet\.org/[^"]*"', 'href="#"', content)
+
+    return content
+
+
+def load_xml_data():
+    """Load XML-parsed JSON data into module globals."""
+    global XML_PAGES, XML_POSTS
+    pages_file = XML_DIR / 'pages.json'
+    posts_file = XML_DIR / 'posts.json'
+    if pages_file.exists():
+        data = json.loads(pages_file.read_text(encoding='utf-8'))
+        XML_PAGES = {p['slug']: p for p in data}
+    if posts_file.exists():
+        XML_POSTS = json.loads(posts_file.read_text(encoding='utf-8'))
+    print(f"  XML: {len(XML_PAGES)} pages, {len(XML_POSTS)} posts loaded")
+
 
 # ---------------------------------------------------------------------------
 # HTML template helpers
@@ -286,25 +347,23 @@ def build_home():
         intro_html = "".join(str(p) for p in paras if p.get_text(strip=True))
         intro_html = clean_html(intro_html)
 
-    # Recent blog posts for homepage
+    # Recent blog posts for homepage — use XML posts (newest first)
     post_items = ""
-    for slug in BLOG_POSTS[:4]:
-        try:
-            ps = load(slug)
-            t  = ps.title.text if ps.title else slug
-            t  = re.sub(r'\s*\|.*$', '', t).strip()
-            date_el = ps.select_one('.entry-date, time, .post-date')
-            date_str = date_el.text.strip() if date_el else ""
-            excerpt_el = ps.select_one(".entry-content p, .post-content p")
-            excerpt = excerpt_el.get_text(strip=True)[:180] + "…" if excerpt_el else ""
-            post_items += f"""
+    recent_posts = list(reversed(XML_POSTS))[:4]  # 4 most recent
+    for post in recent_posts:
+        slug = post['slug']
+        t    = post['title']
+        date_str = post.get('date', '')
+        # Extract first paragraph as excerpt (strip HTML tags)
+        soup_ex = BeautifulSoup(post.get('content', ''), 'lxml')
+        first_p = soup_ex.find('p')
+        excerpt = (first_p.get_text(strip=True)[:200] + '…') if first_p else ''
+        post_items += f"""
         <li>
           <div class="post-title"><a href="blog/{slug}.html">{t}</a></div>
           <div class="post-meta">{date_str}</div>
           <div class="post-excerpt">{excerpt}</div>
         </li>"""
-        except FileNotFoundError:
-            continue
 
     body = f"""{banner_html}
     <div style="padding-top:2.5rem;">
@@ -328,12 +387,19 @@ def build_home():
 
 
 def build_simple_page(slug: str, title: str, nav_label: str):
-    soup  = load(slug)
-    el    = main_content(soup)
-    inner = page_text(soup, el)
-    # Fix image paths (relative within same directory)
-    inner = inner.replace("../images/", "images/")
-    body  = f"""
+    # Prefer XML content over Wayback HTML
+    page_data = XML_PAGES.get(slug)
+    if page_data and page_data['has_content']:
+        inner = xml_to_html(page_data['content'], depth=0)
+        body  = f"""
+    <h1 class="page-title">{title}</h1>
+    <div class="entry-body">{inner}</div>"""
+    else:
+        soup  = load(slug)
+        el    = main_content(soup)
+        inner = page_text(soup, el)
+        inner = inner.replace("../images/", "images/")
+        body  = f"""
     <h1 class="page-title">{title}</h1>
     <div class="entry-body">{inner}</div>"""
     out = SITE_DIR / f"{slug}.html"
@@ -564,63 +630,77 @@ def build_training_schools():
     training_dir = SITE_DIR / "training"
     training_dir.mkdir(exist_ok=True)
     for slug, label in training_slugs:
-        try:
-            ts    = load(slug)
-            el    = main_content(ts)
-            inner = page_text(ts, el)
-            inner = re.sub(r'\.\./images/', '../../images/', inner)
-            t = ts.title.text if ts.title else label
-            t = re.sub(r'\s*\|.*$', '', t).strip()
-            bdy = f"""
+        title_text = None
+        inner = None
+        # Prefer XML content
+        page_data = XML_PAGES.get(slug)
+        if page_data and page_data['has_content']:
+            inner = xml_to_html(page_data['content'], depth=2)
+            title_text = label
+        else:
+            try:
+                ts    = load(slug)
+                el    = main_content(ts)
+                inner = page_text(ts, el)
+                inner = re.sub(r'\.\./images/', '../../images/', inner)
+                t = ts.title.text if ts.title else label
+                title_text = re.sub(r'\s*\|.*$', '', t).strip()
+            except FileNotFoundError:
+                continue
+        if inner is None:
+            continue
+        t = title_text or label
+        bdy = f"""
     <a class="back-link" href="../training-schools.html">Back to Training Schools</a>
     <h1 class="page-title">{t}</h1>
     <div class="entry-body">{inner}</div>"""
-            (training_dir / f"{slug}.html").write_text(
-                page(t, "Training Schools", bdy, depth=2), encoding="utf-8"
-            )
-        except FileNotFoundError:
-            continue
+        (training_dir / f"{slug}.html").write_text(
+            page(t, "Training Schools", bdy, depth=2), encoding="utf-8"
+        )
     print(f"  ✓ training/*.html  ({len(training_slugs)} pages)")
 
 
 def build_blog():
     blog_dir = SITE_DIR / "blog"
+    # Clear stale HTML files before regenerating
+    if blog_dir.exists():
+        for old in blog_dir.glob("*.html"):
+            old.unlink()
     blog_dir.mkdir(exist_ok=True)
+
+    # Use all XML posts (newest first for index)
+    posts_desc = list(reversed(XML_POSTS))
 
     index_items = ""
     built = 0
-    for slug in BLOG_POSTS:
-        try:
-            bs   = load(slug)
-            t    = bs.title.text if bs.title else slug
-            t    = re.sub(r'\s*\|.*$', '', t).strip()
-            date_el = bs.select_one(".entry-date, time, .post-date, .published")
-            date_str = date_el.text.strip() if date_el else ""
-            el   = main_content(bs)
-            inner = page_text(bs, el)
-            inner = re.sub(r'\.\./images/', '../../images/', inner)
-            excerpt_el = bs.select_one(".entry-content p, .post-content p")
-            excerpt = excerpt_el.get_text(strip=True)[:200] + "…" if excerpt_el else ""
+    for post in posts_desc:
+        slug     = post['slug']
+        title    = post['title']
+        date_str = post.get('date', '')
+        content  = xml_to_html(post.get('content', ''), depth=2)
 
-            bdy = f"""
+        # Excerpt from first non-empty paragraph
+        soup_ex   = BeautifulSoup(content, 'lxml')
+        first_p   = soup_ex.find('p')
+        excerpt   = (first_p.get_text(strip=True)[:200] + '…') if first_p else ''
+
+        bdy = f"""
     <a class="back-link" href="index.html">Back to Blog</a>
     <div class="post-header">
-      <h1>{t}</h1>
+      <h1>{title}</h1>
       <div class="post-meta">{date_str}</div>
     </div>
-    <div class="entry-body">{inner}</div>"""
-            (blog_dir / f"{slug}.html").write_text(
-                page(t, "Blog", bdy, depth=2), encoding="utf-8"
-            )
-            index_items += f"""
+    <div class="entry-body">{content}</div>"""
+        (blog_dir / f"{slug}.html").write_text(
+            page(title, "Blog", bdy, depth=2), encoding="utf-8"
+        )
+        index_items += f"""
       <li>
-        <div class="post-title"><a href="{slug}.html">{t}</a></div>
+        <div class="post-title"><a href="{slug}.html">{title}</a></div>
         <div class="post-meta">{date_str}</div>
         <div class="post-excerpt">{excerpt}</div>
       </li>"""
-            built += 1
-        except FileNotFoundError:
-            continue
+        built += 1
 
     index_body = f"""
     <h1 class="page-title">Blog</h1>
@@ -630,6 +710,25 @@ def build_blog():
         page("Blog", "Blog", index_body, depth=2), encoding="utf-8"
     )
     print(f"  ✓ blog/index.html + {built} post pages")
+
+
+def build_extra_pages():
+    """Build extra pages from XML that don't appear in the main nav."""
+    built = 0
+    for slug, title, nav_label in EXTRA_PAGES:
+        page_data = XML_PAGES.get(slug)
+        if not page_data:
+            print(f"  ○ skipped (not in XML): {slug}")
+            continue
+        content = xml_to_html(page_data['content'], depth=0)
+        body = f"""
+    <h1 class="page-title">{title}</h1>
+    <div class="entry-body">{content}</div>"""
+        out = SITE_DIR / f"{slug}.html"
+        out.write_text(page(title, nav_label, body, depth=0), encoding="utf-8")
+        print(f"  ✓ {slug}.html")
+        built += 1
+    print(f"  ({built} extra pages built)")
 
 
 def copy_images():
@@ -649,14 +748,18 @@ def copy_images():
 
 def main():
     print("=" * 55)
-    print("  polenet.org Site Builder  |  Step 4")
+    print("  polenet.org Site Builder  |  Step 4/6")
     print("=" * 55)
 
     # Ensure output dirs exist
     SITE_DIR.mkdir(exist_ok=True)
     SITE_CSS.mkdir(exist_ok=True)
 
-    # Copy images first (needed by all pages)
+    # Load XML data first
+    print("\n[XML data]")
+    load_xml_data()
+
+    # Copy images
     print("\n[Images]")
     copy_images()
 
@@ -670,6 +773,10 @@ def main():
     build_photos()
     build_training_schools()
     build_blog()
+
+    # Extra pages from XML (field season, in-the-news, data, etc.)
+    print("\n[Extra pages from XML]")
+    build_extra_pages()
 
     print("\n" + "=" * 55)
     print("Build complete.")
