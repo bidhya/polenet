@@ -59,9 +59,11 @@ site/
 ├── training-schools.html   (index of training schools)
 ├── blog/
 │   ├── index.html
-│   └── [5 recent post pages]
+│   └── [11 post pages]
 ├── sites/
-│   └── [~46 station pages, auto-generated from site_index.json]
+│   └── [51 station pages, auto-generated from site_index.json]
+├── training/
+│   └── [6 school pages]
 ├── css/
 │   └── style.css
 └── images/                 (copied from archive/images/)
@@ -108,12 +110,3 @@ site/
 └── images/ (162 files)     ✓
 ```
 Total: 75 HTML files, 239 files, 21 MB
-
----
-
-## OPEN QUESTIONS
-- **Site detail pages**: The 51 `home-page-id-*.html` files are individual monitoring site
-  pages (e.g. Backer Island, station ID BACK, coordinates, install dates). Should all 51
-  be rebuilt as individual pages, or just summarised in a table on the Sites page?
-- Are there more blog posts on blog page 2? (need to check `page-2-page-id-81.html`)
-- What hosting will the rebuilt static site use? (affects URL structure decisions)

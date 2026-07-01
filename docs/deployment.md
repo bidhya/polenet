@@ -45,7 +45,7 @@ polenet/                   ← repo root
 
 | Branch | Auto-deploys? | URL | Notes |
 |---|---|---|---|
-| `dev` | Yes | `dev--polenet-XXXX.netlify.app` | Working preview, share with colleague |
+| `dev` | Yes | `monumental-dieffenbachia-d72518.netlify.app` | Working preview, share with colleague |
 | `main` | Paused | `polenet.org` (future) | Enable in Netlify only when ready to launch |
 
 Workflow:
