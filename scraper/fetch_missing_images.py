@@ -39,15 +39,16 @@ DOWNLOAD_DELAY = 1.5  # between image downloads
 
 
 def find_missing_images() -> set[str]:
-    """Find all image filenames referenced in site/ HTML that aren't in archive/images/."""
+    """
+    Find all files referenced under images/ in site/ HTML that aren't in archive/images/.
+    Matches both src= (displayed images) and href= (linked files, e.g. PDFs) at any
+    relative depth — some references are documents, not just <img> tags.
+    """
     archive_imgs = {f.name for f in ARCHIVE_IMG.iterdir() if f.is_file()}
     missing = set()
     for hp in SITE_DIR.rglob("*.html"):
         c = hp.read_text(encoding="utf-8")
-        for img in re.findall(r'src="images/([^"]+)"', c):
-            if img not in archive_imgs:
-                missing.add(img)
-        for img in re.findall(r'src="\.\./\.\./images/([^"]+)"', c):
+        for img in re.findall(r'(?:src|href)="(?:\.\./)*images/([^"]+)"', c):
             if img not in archive_imgs:
                 missing.add(img)
     return missing

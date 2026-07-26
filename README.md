@@ -10,7 +10,7 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 
 | Directory | Contents |
 |-----------|----------|
-| `site/` | The deployable website (75 HTML pages, CSS, 162 images) |
+| `site/` | The deployable website (104 HTML pages, CSS, 161 images — 303 more image/PDF refs still missing pending server access) |
 | `scraper/` | Python scripts to crawl the archive and build the site |
 | `archive/audit/` | Station index JSON + audit reports (source data) |
 | `docs/` | Project notes, decisions, deployment plan |
@@ -30,7 +30,7 @@ Netlify is configured via `netlify.toml` to publish from `site/`.
 ### Make a content change
 ```bash
 # Edit scraper/build_site.py, then:
-python scraper/build_site.py   # regenerate site/
+mamba run python scraper/build_site.py   # regenerate site/
 git add site/
 git commit -m "your change"
 git push origin dev            # Netlify auto-deploys
@@ -39,10 +39,10 @@ git push origin dev            # Netlify auto-deploys
 ### Rebuild from scratch (fresh clone)
 ```bash
 pip install -r scraper/requirements.txt
-python scraper/fetch_archive.py   # Step 1
-python scraper/crawl_site.py      # Step 2 (~15 min)
-python scraper/audit.py           # Step 3
-python scraper/build_site.py      # Step 4 → generates site/
+mamba run python scraper/fetch_archive.py   # Step 1
+mamba run python scraper/crawl_site.py      # Step 2 (~15 min)
+mamba run python scraper/audit.py           # Step 3
+mamba run python scraper/build_site.py      # Step 4 → generates site/
 ```
 
 ---

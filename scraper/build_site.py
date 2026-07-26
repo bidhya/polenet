@@ -53,6 +53,25 @@ EXTRA_PAGES = [
     ("2025-2026-field-season-progress-page", "2025-2026 Field Season Progress", "Blog"),
     ("2024-2025-field-season-progress",  "2024-2025 Field Season Progress", "Blog"),
     ("2023-2024-field-season-progress",  "2023-2024 Field Season Progress", "Blog"),
+    # Full-text press reprints — linked from in-the-news.html "Read more »" links,
+    # which pointed at these page_ids but the pages themselves were never built.
+    ("researchers-brave-antarcticas-wind-chill-to-track-climate-change-at-the-bottom-of-the-world",
+     "Researchers brave Antarctica's wind, chill, to track climate change at the bottom of the world", "About"),
+    ("plane-crash-wont-keep-osu-scientist-off-the-ice",
+     "Plane crash won't keep OSU scientist off the ice", "About"),
+    ("scientists-explore-ice-caps",
+     "Scientists explore ice caps", "About"),
+]
+
+# Training school pages — module level so the page_id link resolver (below) can see them.
+TRAINING_SLUGS = [
+    ("2023-gia-training-school",  "2023 GIA Training School"),
+    ("2019-gia-training-school",  "2019 GIA Training School"),
+    ("2017-glacial-seismology-training-school", "2017 Glacial Seismology Training School"),
+    ("2015-gia-training-school",  "2015 GIA Training School"),
+    ("2025-gia-workshop",         "2025 GIA Workshop"),
+    ("glacial-isostatic-adjustment-training-school-virtual-participation-is-now-open",
+     "GIA Training School — Virtual Participation"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -68,6 +87,42 @@ _POLENET_LINK = re.compile(
 _POLENET_HOME = re.compile(
     r'href="https?://(?:www\.)?polenet\.org/?"'
 )
+# WordPress "?page_id=N" links — resolved against ID_TO_PATH (built in build_id_to_path())
+_PAGE_ID_LINK = re.compile(
+    r'<a([^>]*?)\shref="https?://(?:www\.)?polenet\.org/\?page_id=(\d+)"([^>]*)>(.*?)</a>',
+    re.DOTALL
+)
+# Any other internal polenet.org link we couldn't resolve to a built page
+_POLENET_UNRESOLVED = re.compile(
+    r'<a[^>]*\shref="https?://(?:www\.)?polenet\.org/[^"]*"[^>]*>(.*?)</a>',
+    re.DOTALL
+)
+
+# wp:post_id -> site-relative output path (e.g. "blog/foo.html"), for resolving
+# internal "?page_id=N" links. Populated by build_id_to_path() before any page is built.
+ID_TO_PATH: dict = {}
+
+
+def build_id_to_path():
+    """Map WordPress post/page IDs to the relative path we actually build them at."""
+    global ID_TO_PATH
+    ID_TO_PATH = {}
+    for post in XML_POSTS:
+        pid = post.get('id')
+        if pid:
+            ID_TO_PATH[pid] = f"blog/{post['slug']}.html"
+    for slug, _label in TRAINING_SLUGS:
+        page_data = XML_PAGES.get(slug)
+        if page_data and page_data.get('id'):
+            ID_TO_PATH[page_data['id']] = f"training/{slug}.html"
+    for slug, _title, _nav in EXTRA_PAGES:
+        page_data = XML_PAGES.get(slug)
+        if page_data and page_data.get('id'):
+            ID_TO_PATH[page_data['id']] = f"{slug}.html"
+    for slug in ("about", "publications"):
+        page_data = XML_PAGES.get(slug)
+        if page_data and page_data.get('id'):
+            ID_TO_PATH[page_data['id']] = f"{slug}.html"
 
 
 def xml_to_html(content: str, depth: int = 0) -> str:
@@ -81,7 +136,9 @@ def xml_to_html(content: str, depth: int = 0) -> str:
     - Rewrite src="images/..." and href="images/..." for the correct depth
     - Strip WordPress shortcodes (e.g. [two_thirds], [/one_half])
     - Rewrite internal polenet.org links to local relative paths
-    - Rewrite links to field-season progress pages, etc.
+    - Resolve "?page_id=N" links to the real local page where we know it (ID_TO_PATH);
+      unwrap (keep text, drop the link) anything we can't resolve rather than
+      leaving a fake href="#"
     """
     if not content:
         return ''
@@ -103,10 +160,17 @@ def xml_to_html(content: str, depth: int = 0) -> str:
     content = _POLENET_LINK.sub(rewrite_polenet_link, content)
     content = _POLENET_HOME.sub(f'href="{prefix}index.html"', content)
 
-    # Strip unresolvable ?page_id= links (leave dead, but clean href)
-    content = re.sub(r'href="https?://(?:www\.)?polenet\.org/\?[^"]*"', 'href="#"', content)
-    # Strip any remaining polenet.org links we couldn't resolve
-    content = re.sub(r'href="https?://(?:www\.)?polenet\.org/[^"]*"', 'href="#"', content)
+    # Resolve "?page_id=N" links against known built pages
+    def resolve_page_id(m):
+        pre, pid, post, text = m.group(1), int(m.group(2)), m.group(3), m.group(4)
+        target = ID_TO_PATH.get(pid)
+        if target:
+            return f'<a{pre} href="{prefix}{target}"{post}>{text}</a>'
+        return text  # unresolved — unwrap rather than link to nowhere
+    content = _PAGE_ID_LINK.sub(resolve_page_id, content)
+
+    # Any other unresolved internal polenet.org link — unwrap rather than leave a dead '#'
+    content = _POLENET_UNRESOLVED.sub(lambda m: m.group(1), content)
 
     return content
 
@@ -590,15 +654,7 @@ def build_photos():
 
 def build_training_schools():
     """Training Schools index + individual school pages."""
-    training_slugs = [
-        ("2023-gia-training-school",  "2023 GIA Training School"),
-        ("2019-gia-training-school",  "2019 GIA Training School"),
-        ("2017-glacial-seismology-training-school", "2017 Glacial Seismology Training School"),
-        ("2015-gia-training-school",  "2015 GIA Training School"),
-        ("2025-gia-workshop",         "2025 GIA Workshop"),
-        ("glacial-isostatic-adjustment-training-school-virtual-participation-is-now-open",
-         "GIA Training School — Virtual Participation"),
-    ]
+    training_slugs = TRAINING_SLUGS
 
     cards = ""
     for slug, label in training_slugs:
@@ -758,6 +814,7 @@ def main():
     # Load XML data first
     print("\n[XML data]")
     load_xml_data()
+    build_id_to_path()
 
     # Copy images
     print("\n[Images]")
