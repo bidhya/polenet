@@ -104,6 +104,22 @@ _POLENET_UNRESOLVED = re.compile(
 _WP_VIDEO_BLOCK = re.compile(r'<figure[^>]*class="[^"]*wp-block-video[^"]*"[^>]*>.*?</figure>', re.DOTALL)
 _VIDEO_TAG = re.compile(r'<video\b.*?</video>', re.DOTALL)
 
+# Matches a YouTube video ID out of youtu.be/, youtube.com/watch?v=, /embed/, or /shorts/ URLs
+_YOUTUBE_ID_RE = re.compile(r'(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|shorts/))([A-Za-z0-9_-]{11})')
+
+
+def _extract_youtube_id(url: str) -> str | None:
+    """Pull an 11-char YouTube video ID out of any common paste format, or a bare ID."""
+    if not url:
+        return None
+    url = url.strip()
+    m = _YOUTUBE_ID_RE.search(url)
+    if m:
+        return m.group(1)
+    if re.fullmatch(r'[A-Za-z0-9_-]{11}', url):
+        return url
+    return None
+
 # wp:post_id -> site-relative output path (e.g. "blog/foo.html"), for resolving
 # internal "?page_id=N" links. Populated by build_id_to_path() before any page is built.
 ID_TO_PATH: dict = {}
@@ -113,6 +129,22 @@ ID_TO_PATH: dict = {}
 # hosting is decided (docs/questions.md Q12), this is what makes swapping the strip-out
 # for a real embed a fast, data-driven change instead of re-deriving from raw XML.
 VIDEO_PLACEMENTS: list = []
+
+# filename -> hosting URL (see docs/questions.md Q12). Loaded from archive/xml/video_url_map.json
+# by load_video_url_map(). Blank/missing entries just keep stripping as before — safe to run
+# with a partially-filled map, since uploads trickle in.
+VIDEO_URL_MAP: dict = {}
+
+
+def load_video_url_map():
+    global VIDEO_URL_MAP
+    map_file = XML_DIR / 'video_url_map.json'
+    if map_file.exists():
+        VIDEO_URL_MAP = json.loads(map_file.read_text(encoding='utf-8'))
+    else:
+        VIDEO_URL_MAP = {}
+    filled = sum(1 for v in VIDEO_URL_MAP.values() if v)
+    print(f"  Video URL map: {filled}/{len(VIDEO_URL_MAP)} filled in")
 
 
 def build_id_to_path():
@@ -152,15 +184,18 @@ def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
       unwrap (keep text, drop the link) anything we can't resolve rather than
       leaving a fake href="#"
     - Strip video blocks, recording each one (page, filename, caption) into
-      VIDEO_PLACEMENTS before removing it — see that global for why
+      VIDEO_PLACEMENTS before removing it — see that global for why. If VIDEO_URL_MAP
+      has a hosting URL for the file, emit a real embed instead of stripping to nothing.
     """
     if not content:
         return ''
 
     prefix = '../' * depth
 
-    # Strip video blocks — videos are excluded from the static rebuild (see _WP_VIDEO_BLOCK above).
-    # Record what's being removed and from where before it's gone.
+    # Strip video blocks — videos are excluded from the static rebuild by default (see
+    # _WP_VIDEO_BLOCK above). Record what's being removed and from where before it's gone;
+    # if a hosting URL is already known for this file (VIDEO_URL_MAP, see docs/questions.md
+    # Q12), emit a real embed instead of removing it.
     def _record_and_strip_video(m):
         block = m.group(0)
         fname_m = re.search(r'src="images/([^"]+)"', block)
@@ -174,6 +209,18 @@ def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
             "archive_path": f"archive/images/{fname}" if fname else None,
             "caption_after": caption or None,
         })
+        url = VIDEO_URL_MAP.get(fname) if fname else None
+        if url:
+            yt_id = _extract_youtube_id(url)
+            if yt_id:
+                return (
+                    '<figure class="wp-block-embed-youtube">'
+                    f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{yt_id}" '
+                    f'title="{fname}" frameborder="0" allowfullscreen loading="lazy"></iframe>'
+                    '</figure>'
+                )
+            # URL present but not a recognizable YouTube link — fall back to a direct video tag
+            return f'<figure class="wp-block-video"><video src="{url}" controls></video></figure>'
         return ''
     content = _WP_VIDEO_BLOCK.sub(_record_and_strip_video, content)
     content = _VIDEO_TAG.sub('', content)
@@ -858,6 +905,7 @@ def main():
     print("\n[XML data]")
     load_xml_data()
     build_id_to_path()
+    load_video_url_map()
 
     # Copy images
     print("\n[Images]")
