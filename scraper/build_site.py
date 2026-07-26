@@ -108,6 +108,12 @@ _VIDEO_TAG = re.compile(r'<video\b.*?</video>', re.DOTALL)
 # internal "?page_id=N" links. Populated by build_id_to_path() before any page is built.
 ID_TO_PATH: dict = {}
 
+# Registry of every stripped video placement (page, filename, surrounding caption) —
+# written to archive/xml/video_placements.json at the end of the build. Once video
+# hosting is decided (docs/questions.md Q12), this is what makes swapping the strip-out
+# for a real embed a fast, data-driven change instead of re-deriving from raw XML.
+VIDEO_PLACEMENTS: list = []
+
 
 def build_id_to_path():
     """Map WordPress post/page IDs to the relative path we actually build them at."""
@@ -131,7 +137,7 @@ def build_id_to_path():
             ID_TO_PATH[page_data['id']] = f"{slug}.html"
 
 
-def xml_to_html(content: str, depth: int = 0) -> str:
+def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
     """
     Prepare XML-parsed page/post content for use at a given site depth.
 
@@ -145,14 +151,31 @@ def xml_to_html(content: str, depth: int = 0) -> str:
     - Resolve "?page_id=N" links to the real local page where we know it (ID_TO_PATH);
       unwrap (keep text, drop the link) anything we can't resolve rather than
       leaving a fake href="#"
+    - Strip video blocks, recording each one (page, filename, caption) into
+      VIDEO_PLACEMENTS before removing it — see that global for why
     """
     if not content:
         return ''
 
     prefix = '../' * depth
 
-    # Strip video blocks — videos are excluded from the static rebuild (see _WP_VIDEO_BLOCK above)
-    content = _WP_VIDEO_BLOCK.sub('', content)
+    # Strip video blocks — videos are excluded from the static rebuild (see _WP_VIDEO_BLOCK above).
+    # Record what's being removed and from where before it's gone.
+    def _record_and_strip_video(m):
+        block = m.group(0)
+        fname_m = re.search(r'src="images/([^"]+)"', block)
+        fname = fname_m.group(1) if fname_m else None
+        after = content[m.end():m.end() + 300]
+        cap_m = re.match(r'\s*<p>(.*?)</p>', after, re.DOTALL)
+        caption = re.sub(r'<[^>]+>', '', cap_m.group(1)).strip() if cap_m else None
+        VIDEO_PLACEMENTS.append({
+            "page": page_slug,
+            "video_file": fname,
+            "archive_path": f"archive/images/{fname}" if fname else None,
+            "caption_after": caption or None,
+        })
+        return ''
+    content = _WP_VIDEO_BLOCK.sub(_record_and_strip_video, content)
     content = _VIDEO_TAG.sub('', content)
 
     # Adjust image paths
@@ -464,7 +487,7 @@ def build_simple_page(slug: str, title: str, nav_label: str):
     # Prefer XML content over Wayback HTML
     page_data = XML_PAGES.get(slug)
     if page_data and page_data['has_content']:
-        inner = xml_to_html(page_data['content'], depth=0)
+        inner = xml_to_html(page_data['content'], depth=0, page_slug=slug)
         body  = f"""
     <h1 class="page-title">{title}</h1>
     <div class="entry-body">{inner}</div>"""
@@ -701,7 +724,7 @@ def build_training_schools():
         # Prefer XML content
         page_data = XML_PAGES.get(slug)
         if page_data and page_data['has_content']:
-            inner = xml_to_html(page_data['content'], depth=2)
+            inner = xml_to_html(page_data['content'], depth=2, page_slug=slug)
             title_text = label
         else:
             try:
@@ -743,7 +766,7 @@ def build_blog():
         slug     = post['slug']
         title    = post['title']
         date_str = post.get('date', '')
-        content  = xml_to_html(post.get('content', ''), depth=2)
+        content  = xml_to_html(post.get('content', ''), depth=2, page_slug=slug)
 
         # Excerpt from first non-empty paragraph
         soup_ex   = BeautifulSoup(content, 'lxml')
@@ -786,7 +809,7 @@ def build_extra_pages():
         if not page_data:
             print(f"  ○ skipped (not in XML): {slug}")
             continue
-        content = xml_to_html(page_data['content'], depth=0)
+        content = xml_to_html(page_data['content'], depth=0, page_slug=slug)
         body = f"""
     <h1 class="page-title">{title}</h1>
     <div class="entry-body">{content}</div>"""
@@ -854,6 +877,14 @@ def main():
     # Extra pages from XML (field season, in-the-news, data, etc.)
     print("\n[Extra pages from XML]")
     build_extra_pages()
+
+    # Video placement registry (see docs/questions.md Q12) — every video stripped
+    # during the build above, recorded for a fast data-driven swap-in once hosting
+    # is decided
+    print("\n[Video placements]")
+    video_out = XML_DIR / "video_placements.json"
+    video_out.write_text(json.dumps(VIDEO_PLACEMENTS, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"  ✓ {len(VIDEO_PLACEMENTS)} video placements → {video_out.relative_to(BASE_DIR)}")
 
     print("\n" + "=" * 55)
     print("Build complete.")
