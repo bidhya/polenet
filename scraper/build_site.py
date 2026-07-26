@@ -45,7 +45,7 @@ XML_POSTS: list = []  # all published posts, chronological
 # Extra pages to build from XML (not in the main nav)
 # Each entry: (slug, title, nav_label_for_active_highlight)
 EXTRA_PAGES = [
-    ("in-the-news",                      "In the News",               "About"),
+    ("in-the-news",                      "In the News",               "In the News"),
     ("data",                             "Data",                      "Sites and Data"),
     ("meet-the-researchers",             "Meet the Researchers",      "About"),
     ("quick-facts",                      "Quick Facts",               "About"),
@@ -56,11 +56,11 @@ EXTRA_PAGES = [
     # Full-text press reprints — linked from in-the-news.html "Read more »" links,
     # which pointed at these page_ids but the pages themselves were never built.
     ("researchers-brave-antarcticas-wind-chill-to-track-climate-change-at-the-bottom-of-the-world",
-     "Researchers brave Antarctica's wind, chill, to track climate change at the bottom of the world", "About"),
+     "Researchers brave Antarctica's wind, chill, to track climate change at the bottom of the world", "In the News"),
     ("plane-crash-wont-keep-osu-scientist-off-the-ice",
-     "Plane crash won't keep OSU scientist off the ice", "About"),
+     "Plane crash won't keep OSU scientist off the ice", "In the News"),
     ("scientists-explore-ice-caps",
-     "Scientists explore ice caps", "About"),
+     "Scientists explore ice caps", "In the News"),
 ]
 
 # Training school pages — module level so the page_id link resolver (below) can see them.
@@ -275,6 +275,7 @@ def load_xml_data():
 NAV_ITEMS = [
     ("Home",              "../index.html"),
     ("About",             "../about.html"),
+    ("In the News",       "../in-the-news.html"),
     ("Sites and Data",    "../sites.html"),
     ("Photos",            "../photos.html"),
     ("Publications",      "../publications.html"),
@@ -339,6 +340,7 @@ def page(title: str, active: str, body: str, depth: int = 0) -> str:
       <a href="{prefix}sites.html">Sites</a>
       <a href="{prefix}publications.html">Publications</a>
       <a href="{prefix}blog/index.html">Blog</a>
+      <a href="{prefix}links.html">Links</a>
     </div>
     <div class="social-icons">
       <a href="https://www.facebook.com/polenet" target="_blank" rel="noopener">
@@ -546,6 +548,14 @@ def build_simple_page(slug: str, title: str, nav_label: str):
         body  = f"""
     <h1 class="page-title">{title}</h1>
     <div class="entry-body">{inner}</div>"""
+    if slug == "about":
+        # These two pages exist in the XML export but have no nav entry of their
+        # own — link them from About instead of adding more top-level nav items.
+        body += """
+    <p style="margin-top:1.5rem;font-family:var(--font-ui);font-size:.875rem;">
+      Learn more: <a href="meet-the-researchers.html">Meet the Researchers</a> ·
+      <a href="quick-facts.html">Quick Facts</a>
+    </p>"""
     out = SITE_DIR / f"{slug}.html"
     out.write_text(page(title, nav_label, body, depth=0), encoding="utf-8")
     print(f"  ✓ {out.relative_to(SITE_DIR)}")
@@ -618,6 +628,9 @@ def build_sites():
     body = f"""
     <h1 class="page-title">Sites and Data</h1>
     <div class="sites-intro">{intro_paras or '<p>POLENET operates a network of geophysical monitoring stations across Antarctica and Greenland.</p>'}</div>
+    <p style="font-family:var(--font-ui);font-size:.875rem;">
+      <a href="data.html">Access GPS, seismic &amp; gravity data archives →</a>
+    </p>
     <div class="sites-table-wrap">
       <table class="sites-table">
         <thead>
@@ -782,6 +795,10 @@ def build_training_schools():
         page_data = XML_PAGES.get(slug)
         if page_data and page_data['has_content']:
             inner = xml_to_html(page_data['content'], depth=2, page_slug=slug)
+            if slug == "2015-gia-training-school":
+                # Stray literal "test" in the original WordPress content, right after
+                # the last lecture link — an editing leftover, not real content (Q11).
+                inner = re.sub(r'(</ul>)\s*test\s*$', r'\1', inner)
             title_text = label
         else:
             try:
@@ -817,7 +834,36 @@ def build_blog():
     # Use all XML posts (newest first for index)
     posts_desc = list(reversed(XML_POSTS))
 
+    # Pin the 3 field-season progress pages at the top — they're the most current,
+    # actively-updated content on the site, but live at site root (built by
+    # build_extra_pages(), not here) so they'd otherwise never appear on the Blog
+    # index at all, only reachable by direct URL. Link to the root page instead of
+    # duplicating it into blog/; extract the excerpt from raw content directly
+    # rather than via xml_to_html(), which would double-record these pages'
+    # videos into VIDEO_PLACEMENTS as a side effect since build_extra_pages()
+    # already ran xml_to_html() on them once.
+    field_season_slugs = [
+        "2025-2026-field-season-progress-page",
+        "2024-2025-field-season-progress",
+        "2023-2024-field-season-progress",
+    ]
     index_items = ""
+    for slug in field_season_slugs:
+        page_data = XML_PAGES.get(slug)
+        if not page_data or not page_data['has_content']:
+            continue
+        title = page_data['title']
+        date_str = page_data.get('date', '')
+        soup_ex = BeautifulSoup(page_data['content'], 'lxml')
+        first_p = soup_ex.find('p')
+        excerpt = (first_p.get_text(strip=True)[:200] + '…') if first_p else ''
+        index_items += f"""
+      <li>
+        <div class="post-title"><a href="../{slug}.html">{title}</a></div>
+        <div class="post-meta">{date_str}</div>
+        <div class="post-excerpt">{excerpt}</div>
+      </li>"""
+
     built = 0
     for post in posts_desc:
         slug     = post['slug']
