@@ -1,6 +1,6 @@
 # polenet.org — Static Site Rebuild
 
-A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network), reverse-engineered from the Internet Archive after the original WordPress site became unrecoverable.
+A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network). The original WordPress site's Aries theme broke and stopped rendering; the underlying WordPress database and media library are still intact and reachable, but the goal is to migrate off WordPress/Aries entirely rather than just fix the theme. Built from a WordPress XML export plus the Internet Archive as a fallback/design reference.
 
 **Live preview:** https://monumental-dieffenbachia-d72518.netlify.app/
 
@@ -10,13 +10,17 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 
 | Directory | Contents |
 |-----------|----------|
-| `site/` | The deployable website (104 HTML pages, CSS, 161 images — 303 more image/PDF refs still missing pending server access) |
+| `site/` | The deployable website (104 HTML pages, CSS, 429 images/PDFs) |
 | `scraper/` | Python scripts to crawl the archive and build the site |
 | `archive/audit/` | Station index JSON + audit reports (source data) |
 | `docs/` | Project notes, decisions, deployment plan |
 
 > `archive/html/` and `archive/images/` are gitignored — too large to commit.
 > See **Rebuild from scratch** below if you need them.
+>
+> 35 videos (~298 MB) referenced in the original content are intentionally excluded from
+> the static rebuild — hosting strategy (likely YouTube) still being decided. See
+> `docs/questions.md` Q12 if you're picking this up.
 
 ---
 
@@ -39,10 +43,14 @@ git push origin dev            # Netlify auto-deploys
 ### Rebuild from scratch (fresh clone)
 ```bash
 pip install -r scraper/requirements.txt
-mamba run python scraper/fetch_archive.py   # Step 1
-mamba run python scraper/crawl_site.py      # Step 2 (~15 min)
-mamba run python scraper/audit.py           # Step 3
-mamba run python scraper/build_site.py      # Step 4 → generates site/
+mamba run python scraper/fetch_archive.py   # Step 1 — Wayback homepage/images (historical)
+mamba run python scraper/crawl_site.py      # Step 2 — full Wayback crawl (historical, ~15 min)
+mamba run python scraper/audit.py           # Step 3 — classify pages (historical)
+mamba run python scraper/parse_xml.py       # Step 6 — WordPress XML export → archive/xml/*.json
+                                             #   (needs Scratch/*.xml — gitignored, ask for a copy)
+mamba run python scraper/build_site.py      # Step 4/6 → generates site/
+mamba run python scraper/fetch_live_uploads.py  # Step 7 — pull missing images/PDFs from the
+                                                 #   live polenet.org server, then re-run build_site.py
 ```
 
 ---
