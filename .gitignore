@@ -6,6 +6,7 @@ archive/assets/
 # Internal docs / agent context — not needed in the deployed repo
 docs/
 AGENTS.md
+CLAUDE.md
 Scratch/
 
 # Python
