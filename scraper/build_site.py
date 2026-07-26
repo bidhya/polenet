@@ -561,6 +561,16 @@ def build_publications():
             if re.match(r'^20\d{2}$', t):
                 h.name = "h2"
                 h["class"] = ["pub-year"]
+            elif h.name == "h1" and t.lower() == "publications":
+                # Redundant with our own page-title <h1> above — the source content
+                # repeats the page title inline; drop it rather than show it twice.
+                h.decompose()
+            elif h.name == "h1":
+                # A stray <h1> for a category label (e.g. "JOURNAL PUBLICATIONS BY
+                # PROJECT TEAM:") — every other occurrence of the same label is a
+                # bold+underlined <p>, not a heading. Normalize to match instead of
+                # rendering one oversized heading in the middle of the citation list.
+                h.name = "p"
         # Wrap paragraphs of citations into a pub-list
         inner = page_text(soup, el)
     else:
