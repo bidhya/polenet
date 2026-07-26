@@ -97,6 +97,12 @@ _POLENET_UNRESOLVED = re.compile(
     r'<a[^>]*\shref="https?://(?:www\.)?polenet\.org/[^"]*"[^>]*>(.*?)</a>',
     re.DOTALL
 )
+# WordPress video blocks (e.g. <figure class="wp-block-video"><video controls src="images/x.mov"></video></figure>)
+# Videos are intentionally excluded from the static rebuild (large files — see docs/discovery-log.md
+# 2026-07-26 for the video-hosting strategy discussion); strip the whole block rather than leave a
+# dangling reference to a file that copy_images() also deliberately skips.
+_WP_VIDEO_BLOCK = re.compile(r'<figure[^>]*class="[^"]*wp-block-video[^"]*"[^>]*>.*?</figure>', re.DOTALL)
+_VIDEO_TAG = re.compile(r'<video\b.*?</video>', re.DOTALL)
 
 # wp:post_id -> site-relative output path (e.g. "blog/foo.html"), for resolving
 # internal "?page_id=N" links. Populated by build_id_to_path() before any page is built.
@@ -144,6 +150,10 @@ def xml_to_html(content: str, depth: int = 0) -> str:
         return ''
 
     prefix = '../' * depth
+
+    # Strip video blocks — videos are excluded from the static rebuild (see _WP_VIDEO_BLOCK above)
+    content = _WP_VIDEO_BLOCK.sub('', content)
+    content = _VIDEO_TAG.sub('', content)
 
     # Adjust image paths
     if depth > 0:
@@ -787,15 +797,25 @@ def build_extra_pages():
     print(f"  ({built} extra pages built)")
 
 
+# Videos are excluded from the static rebuild — large files, not part of the site design
+# (see docs/discovery-log.md 2026-07-26). Kept in archive/images/ for reference; just not
+# copied into site/images/ or committed.
+_VIDEO_EXTS = {".mp4", ".mov", ".avi", ".wmv"}
+
+
 def copy_images():
     SITE_IMG.mkdir(exist_ok=True)
     copied = 0
+    skipped_videos = 0
     for f in ARCHIVE_IMG.iterdir():
+        if f.suffix.lower() in _VIDEO_EXTS:
+            skipped_videos += 1
+            continue
         dest = SITE_IMG / f.name
         if not dest.exists():
             shutil.copy2(f, dest)
             copied += 1
-    print(f"  ✓ images/ — {copied} files copied ({len(list(SITE_IMG.iterdir()))} total)")
+    print(f"  ✓ images/ — {copied} files copied ({len(list(SITE_IMG.iterdir()))} total, {skipped_videos} videos skipped)")
 
 
 # ---------------------------------------------------------------------------
