@@ -18,9 +18,10 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 > `archive/html/` and `archive/images/` are gitignored — too large to commit.
 > See **Rebuild from scratch** below if you need them.
 >
-> 35 videos (~298 MB) referenced in the original content are intentionally excluded from
-> the static rebuild — hosting strategy (likely YouTube) still being decided. See
-> `docs/questions.md` Q12 if you're picking this up.
+> 35 videos referenced in the original content are embedded via YouTube (currently the
+> project owner's personal account, Unlisted, as an interim solution) rather than committed
+> as files. Migrating to the official POLENET channel once access is confirmed is still owed —
+> see `docs/questions.md` Q12 if you're picking this up.
 
 ---
 
