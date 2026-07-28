@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-fetch_live_uploads.py — Download missing images/files directly from the live
-polenet.org WordPress site.
+fetch_live_uploads.py — Download missing images/files directly from
+polenet.org's public WordPress media library.
 
-Background (see docs/discovery-log.md 2026-07-26): polenet.org is not offline —
-its Aries theme broke, but the database and media library are intact and the
-site is reachable. wp-content/uploads/ files are public, no login needed.
+polenet.org's uploaded media files are publicly accessible over HTTPS with no
+login required.
 
 This is the primary Step 7 recovery path, ahead of fetch_missing_images.py
 (Wayback CDX), because it pulls from the live source of truth: the WordPress

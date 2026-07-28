@@ -1,6 +1,6 @@
 # polenet.org — Static Site Rebuild
 
-A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network). The original WordPress site's Aries theme broke and stopped rendering; the underlying WordPress database and media library are still intact and reachable, but the goal is to migrate off WordPress/Aries entirely rather than just fix the theme. Built from a WordPress XML export plus the Internet Archive as a fallback/design reference.
+A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network). The original WordPress site's theme broke and stopped rendering, so this project moves the site off WordPress entirely rather than patch the old theme. Built from a WordPress XML export plus the Internet Archive as a fallback/design reference.
 
 **Live previews:**
 - GitHub Pages (`pages` branch, primary dev target): https://bidhya.github.io/polenet/
