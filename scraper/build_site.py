@@ -683,6 +683,9 @@ def build_site_detail_pages(real_sites):
                     paras = [p for p in el.find_all("p") if p.get_text(strip=True) and len(p.get_text(strip=True)) > 30]
                     desc_html = "".join(str(p) for p in paras)
                     desc_html = clean_html(desc_html)
+                    # clean_html() always emits root-relative "images/..." paths;
+                    # this page is depth=1 (site/sites/{sid}.html), so correct for it.
+                    desc_html = desc_html.replace('src="images/', 'src="../images/')
                 # Look for a photo matching station ID
                 img_candidates = list(ARCHIVE_IMG.glob(f"{sid}-*.jpg")) + list(ARCHIVE_IMG.glob(f"{sid}_*.jpg"))
                 if not img_candidates:
@@ -742,8 +745,8 @@ def build_photos():
     grid_items = ""
     for img in gallery_imgs:
         grid_items += f"""
-      <a href="../images/{img.name}" class="glightbox" data-gallery="polenet">
-        <img src="../images/{img.name}" alt="" loading="lazy">
+      <a href="images/{img.name}" class="glightbox" data-gallery="polenet">
+        <img src="images/{img.name}" alt="" loading="lazy">
       </a>"""
 
     body = f"""
