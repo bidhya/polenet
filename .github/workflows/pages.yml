@@ -2,7 +2,7 @@ name: Deploy site/ to GitHub Pages
 
 on:
   push:
-    branches: ["main"]
+    branches: ["pages"] # temporarily testing here; switch back to ["main"] once satisfied
     paths: ["site/**"]
   workflow_dispatch:
 
