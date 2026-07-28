@@ -61,6 +61,34 @@ EXTRA_PAGES = [
      "Plane crash won't keep OSU scientist off the ice", "In the News"),
     ("scientists-explore-ice-caps",
      "Scientists explore ice caps", "In the News"),
+    # Training-school sub-pages — real published children of the top-level training
+    # school pages (course content, agendas, photo pages, etc.) that the parent pages
+    # already link to, but that were never built. Built at site root (not under
+    # training/) because the existing links to them (rewritten by _POLENET_LINK from
+    # raw polenet.org/slug/ hrefs) already resolve to "../{slug}.html" — flat, same as
+    # the press reprints above.
+    ("2019-gia-training-school-course-work-preparation",
+     "2019 GIA Training School - Course Content", "Training Schools"),
+    ("2019-gia-training-school-virtual-participation",
+     "2019 GIA Training School - Recorded Lectures", "Training Schools"),
+    ("2019-gia-training-school-photos",
+     "2019 GIA Training School Photos", "Training Schools"),
+    ("2023-gia-training-school-course-content",
+     "2023 GIA Training School Course Content", "Training Schools"),
+    ("2023-gia-training-school-photos",
+     "2023 GIA Training School Photos", "Training Schools"),
+    ("2025-gia-workshop-code-of-conduct",
+     "2025 GIA Workshop Code of Conduct", "Training Schools"),
+    ("2025-gia-workshop-photos",
+     "2025 GIA Workshop Photos", "Training Schools"),
+    ("2025-gia-workshop-virtual-poster-gallery",
+     "2025 GIA Workshop Virtual Poster Gallery", "Training Schools"),
+    ("glacial-seismology-school-presentations",
+     "Glacial Seismology School Presentations", "Training Schools"),
+    ("glacial-seismology-training-school-agenda",
+     "Glacial Seismology Training School Agenda", "Training Schools"),
+    ("training-school-homework-exercises-and-preparation-materials",
+     "Training School Homework Exercises and Preparation Materials", "Training Schools"),
 ]
 
 # Training school pages — module level so the page_id link resolver (below) can see them.
@@ -124,6 +152,12 @@ def _extract_youtube_id(url: str) -> str | None:
 # internal "?page_id=N" links. Populated by build_id_to_path() before any page is built.
 ID_TO_PATH: dict = {}
 
+# slug -> site-relative output path, same coverage as ID_TO_PATH but keyed by slug —
+# used by page_text() (the Wayback-fallback content path) to resolve internal
+# polenet.org/{slug}/ links, since Wayback-archived content carries the permalink
+# slug directly rather than a "?page_id=N" query string. Populated alongside ID_TO_PATH.
+SLUG_TO_PATH: dict = {}
+
 # Registry of every stripped video placement (page, filename, surrounding caption) —
 # written to archive/xml/video_placements.json at the end of the build. Once video
 # hosting is decided (docs/questions.md Q12), this is what makes swapping the strip-out
@@ -148,25 +182,48 @@ def load_video_url_map():
 
 
 def build_id_to_path():
-    """Map WordPress post/page IDs to the relative path we actually build them at."""
-    global ID_TO_PATH
+    """Map WordPress post/page IDs (and slugs) to the relative path we actually build them at."""
+    global ID_TO_PATH, SLUG_TO_PATH
     ID_TO_PATH = {}
+    SLUG_TO_PATH = {}
     for post in XML_POSTS:
         pid = post.get('id')
+        target = f"blog/{post['slug']}.html"
         if pid:
-            ID_TO_PATH[pid] = f"blog/{post['slug']}.html"
+            ID_TO_PATH[pid] = target
+        SLUG_TO_PATH[post['slug']] = target
     for slug, _label in TRAINING_SLUGS:
+        target = f"training/{slug}.html"
         page_data = XML_PAGES.get(slug)
         if page_data and page_data.get('id'):
-            ID_TO_PATH[page_data['id']] = f"training/{slug}.html"
+            ID_TO_PATH[page_data['id']] = target
+        SLUG_TO_PATH[slug] = target
     for slug, _title, _nav in EXTRA_PAGES:
+        target = f"{slug}.html"
         page_data = XML_PAGES.get(slug)
         if page_data and page_data.get('id'):
-            ID_TO_PATH[page_data['id']] = f"{slug}.html"
+            ID_TO_PATH[page_data['id']] = target
+        SLUG_TO_PATH[slug] = target
     for slug in ("about", "publications"):
+        target = f"{slug}.html"
         page_data = XML_PAGES.get(slug)
         if page_data and page_data.get('id'):
-            ID_TO_PATH[page_data['id']] = f"{slug}.html"
+            ID_TO_PATH[page_data['id']] = target
+        SLUG_TO_PATH[slug] = target
+    # Other top-level nav pages, in case raw content ever links to them by slug
+    SLUG_TO_PATH["sites"] = "sites.html"
+    SLUG_TO_PATH["photos"] = "photos.html"
+    SLUG_TO_PATH["training-schools"] = "training-schools.html"
+    SLUG_TO_PATH["blog"] = "blog/index.html"
+    # 6 monitoring stations that happened to get human-readable WordPress slugs
+    # instead of the "home-page-id-XXXX" pattern (see docs/questions.md Q8) — they're
+    # real built pages, just under their station ID, not their original slug.
+    for slug, station_id in (
+        ("gould-knoll", "GLDK"), ("lepley-nunatak", "LPLY"),
+        ("martin-peninsula", "MRTP"), ("miller-crag", "MCRG"),
+        ("mt-takahe", "MTAK"), ("slater-rocks-2", "SLTR"),
+    ):
+        SLUG_TO_PATH[slug] = f"sites/{station_id}.html"
 
 
 def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
@@ -233,10 +290,16 @@ def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
     # Strip WordPress shortcodes
     content = _WP_SHORTCODE.sub('', content)
 
-    # Rewrite internal polenet.org links (slug/page-name form)
+    # Rewrite internal polenet.org links (slug/page-name form) against known built
+    # pages. A slug we don't recognize is left untouched here rather than guessed at
+    # (e.g. assumed to be a flat root page) — _POLENET_UNRESOLVED below will unwrap it
+    # to plain text instead of leaving a link to a page that doesn't exist.
     def rewrite_polenet_link(m):
         raw_slug = m.group(1).rstrip('/')
-        return f'href="{prefix}{raw_slug}.html"'
+        target = SLUG_TO_PATH.get(raw_slug)
+        if target:
+            return f'href="{prefix}{target}"'
+        return m.group(0)
     content = _POLENET_LINK.sub(rewrite_polenet_link, content)
     content = _POLENET_HOME.sub(f'href="{prefix}index.html"', content)
 
@@ -403,10 +466,15 @@ def clean_html(el) -> str:
     return html
 
 
-def page_text(soup: BeautifulSoup, el) -> str:
-    """Get clean inner HTML of a content element."""
+def page_text(soup: BeautifulSoup, el, depth: int = 1) -> str:
+    """Get clean inner HTML of a content element.
+
+    depth follows the same convention as xml_to_html(): 0 for root pages,
+    1 for one-level-deep subdirectory pages (e.g. training/x.html).
+    """
     if el is None:
         return "<p>Content not available.</p>"
+    prefix = "../" * depth
     # Remove known WP noise inside content
     for tag in el.find_all(class_=re.compile("sharedaddy|wpcnt|post-nav|post-footer|comments|wp-block-comment")):
         tag.decompose()
@@ -445,11 +513,11 @@ def page_text(soup: BeautifulSoup, el) -> str:
         m = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/https?://[^/]+(/wp-content/uploads/.+?)(?:\?|$)', src)
         if m:
             fname = Path(m.group(1)).name.split("?")[0]
-            img["src"] = f"../images/{fname}"
+            img["src"] = f"{prefix}images/{fname}"
             img["loading"] = "lazy"
         elif "wp-content" in src:
             fname = Path(src).name.split("?")[0]
-            img["src"] = f"../images/{fname}"
+            img["src"] = f"{prefix}images/{fname}"
             img["loading"] = "lazy"
     # Fix anchor hrefs — strip Wayback wrapper from all links
     for a in el.find_all("a", href=True):
@@ -462,8 +530,18 @@ def page_text(soup: BeautifulSoup, el) -> str:
             children = [c for c in a.children if str(c).strip()]
             if len(children) == 1 and getattr(children[0], 'name', None) == 'img' and '/wp-content/' in internal_path:
                 a.unwrap()
+                continue
+            # Resolve against known built pages by slug (mirrors xml_to_html()'s
+            # ?page_id=N resolution, but Wayback content carries the permalink slug
+            # directly rather than a page-id query string).
+            slug = internal_path.strip('/').split('/')[0] if internal_path.strip('/') else ''
+            if not slug:
+                a["href"] = f"{prefix}index.html"
+            elif slug in SLUG_TO_PATH:
+                a["href"] = f"{prefix}{SLUG_TO_PATH[slug]}"
             else:
-                a["href"] = internal_path
+                # Unresolved — unwrap rather than leave a dead absolute path
+                a.unwrap()
             continue
         # External links still wrapped in Wayback → unwrap to real URL
         m2 = re.search(r'https?://web\.archive\.org/web/\d+[^/]*/(https?://.*)', href)
@@ -548,8 +626,7 @@ def build_simple_page(slug: str, title: str, nav_label: str):
     else:
         soup  = load(slug)
         el    = main_content(soup)
-        inner = page_text(soup, el)
-        inner = inner.replace("../images/", "images/")
+        inner = page_text(soup, el, depth=0)
         body  = f"""
     <h1 class="page-title">{title}</h1>
     <div class="entry-body">{inner}</div>"""
@@ -587,10 +664,9 @@ def build_publications():
                 # rendering one oversized heading in the middle of the citation list.
                 h.name = "p"
         # Wrap paragraphs of citations into a pub-list
-        inner = page_text(soup, el)
+        inner = page_text(soup, el, depth=0)
     else:
         inner = "<p>Publications list not available.</p>"
-    inner = inner.replace("../images/", "images/")
     body  = f"""
     <h1 class="page-title">Publications</h1>
     <div class="entry-body">{inner}</div>"""
@@ -812,7 +888,7 @@ def build_training_schools():
             try:
                 ts    = load(slug)
                 el    = main_content(ts)
-                inner = page_text(ts, el)
+                inner = page_text(ts, el, depth=1)
                 t = ts.title.text if ts.title else label
                 title_text = re.sub(r'\s*\|.*$', '', t).strip()
             except FileNotFoundError:
