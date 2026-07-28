@@ -206,7 +206,7 @@ def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
         VIDEO_PLACEMENTS.append({
             "page": page_slug,
             "video_file": fname,
-            "archive_path": f"archive/images/{fname}" if fname else None,
+            "archive_path": f"archive/images/videos/{fname}" if fname else None,
             "caption_after": caption or None,
         })
         url = VIDEO_URL_MAP.get(fname) if fname else None
@@ -964,16 +964,21 @@ def build_extra_pages():
 
 
 # Videos are excluded from the static rebuild — large files, not part of the site design
-# (see docs/discovery-log.md 2026-07-26). Kept in archive/images/ for reference; just not
-# copied into site/images/ or committed.
+# (see docs/discovery-log.md 2026-07-26). Kept in archive/images/videos/ for reference; just
+# not copied into site/images/ or committed.
 _VIDEO_EXTS = {".mp4", ".mov", ".avi", ".wmv"}
 
 
 def copy_images():
+    """Copy every non-video file from archive/images/ (including its videos/ and pdfs/
+    subfolders — organized 2026-07-28, see docs/discovery-log.md) into site/images/,
+    flattened, since every built page's image/PDF links assume a flat images/ path."""
     SITE_IMG.mkdir(exist_ok=True)
     copied = 0
     skipped_videos = 0
-    for f in ARCHIVE_IMG.iterdir():
+    for f in ARCHIVE_IMG.rglob("*"):
+        if not f.is_file():
+            continue
         if f.suffix.lower() in _VIDEO_EXTS:
             skipped_videos += 1
             continue

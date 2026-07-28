@@ -62,9 +62,25 @@ def get(url: str, timeout: int = 20) -> requests.Response:
         return requests.get(url, timeout=timeout, verify=False)
 
 
+_PDF_EXT = ".pdf"
+_VIDEO_EXTS = {".mp4", ".mov", ".avi", ".wmv"}
+
+
+def _archive_dest(fname: str) -> Path:
+    """Route by file type: archive/images/ is organized into videos/ and pdfs/
+    subfolders (2026-07-28, see docs/discovery-log.md) — photos stay flat in the root."""
+    suffix = Path(fname).suffix.lower()
+    if suffix == _PDF_EXT:
+        return ARCHIVE_IMG / "pdfs" / fname
+    if suffix in _VIDEO_EXTS:
+        return ARCHIVE_IMG / "videos" / fname
+    return ARCHIVE_IMG / fname
+
+
 def find_missing_files() -> set[str]:
-    """Find all files referenced under images/ in site/ HTML that aren't in archive/images/."""
-    archive_files = {f.name for f in ARCHIVE_IMG.iterdir() if f.is_file()}
+    """Find all files referenced under images/ in site/ HTML that aren't in archive/images/
+    (including its videos/ and pdfs/ subfolders)."""
+    archive_files = {f.name for f in ARCHIVE_IMG.rglob("*") if f.is_file()}
     missing = set()
     for hp in SITE_DIR.rglob("*.html"):
         c = hp.read_text(encoding="utf-8", errors="replace")
@@ -164,10 +180,11 @@ def main():
 
     ok = fail = skipped = 0
     for fname, url in resolved:
-        dest = ARCHIVE_IMG / fname
+        dest = _archive_dest(fname)
         if dest.exists():
             skipped += 1
             continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
         if download(url, dest):
             print(f"  OK   {fname} ({dest.stat().st_size // 1024} KB)")
             ok += 1

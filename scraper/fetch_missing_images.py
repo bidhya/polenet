@@ -38,13 +38,29 @@ CDX_DELAY     = 1.0   # between CDX API calls
 DOWNLOAD_DELAY = 1.5  # between image downloads
 
 
+_PDF_EXT = ".pdf"
+_VIDEO_EXTS = {".mp4", ".mov", ".avi", ".wmv"}
+
+
+def _archive_dest(fname: str) -> Path:
+    """Route by file type: archive/images/ is organized into videos/ and pdfs/
+    subfolders (2026-07-28, see docs/discovery-log.md) — photos stay flat in the root."""
+    suffix = Path(fname).suffix.lower()
+    if suffix == _PDF_EXT:
+        return ARCHIVE_IMG / "pdfs" / fname
+    if suffix in _VIDEO_EXTS:
+        return ARCHIVE_IMG / "videos" / fname
+    return ARCHIVE_IMG / fname
+
+
 def find_missing_images() -> set[str]:
     """
-    Find all files referenced under images/ in site/ HTML that aren't in archive/images/.
-    Matches both src= (displayed images) and href= (linked files, e.g. PDFs) at any
-    relative depth — some references are documents, not just <img> tags.
+    Find all files referenced under images/ in site/ HTML that aren't in archive/images/
+    (including its videos/ and pdfs/ subfolders). Matches both src= (displayed images) and
+    href= (linked files, e.g. PDFs) at any relative depth — some references are documents,
+    not just <img> tags.
     """
-    archive_imgs = {f.name for f in ARCHIVE_IMG.iterdir() if f.is_file()}
+    archive_imgs = {f.name for f in ARCHIVE_IMG.rglob("*") if f.is_file()}
     missing = set()
     for hp in SITE_DIR.rglob("*.html"):
         c = hp.read_text(encoding="utf-8")
@@ -166,10 +182,11 @@ def main():
 
     print(f"\nQuerying Wayback CDX and downloading ({len(to_download)} images)...")
     for i, (fname, original_url) in enumerate(to_download):
-        dest = ARCHIVE_IMG / fname
+        dest = _archive_dest(fname)
         if dest.exists():
             print(f"  [skip] {fname} — already exists")
             continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
 
         # CDX query
         time.sleep(CDX_DELAY)
