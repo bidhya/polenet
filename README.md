@@ -2,7 +2,8 @@
 
 A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network). The original WordPress site's Aries theme broke and stopped rendering; the underlying WordPress database and media library are still intact and reachable, but the goal is to migrate off WordPress/Aries entirely rather than just fix the theme. Built from a WordPress XML export plus the Internet Archive as a fallback/design reference.
 
-**Live preview:** https://monumental-dieffenbachia-d72518.netlify.app/
+**Live preview (Netlify, `dev` branch):** https://monumental-dieffenbachia-d72518.netlify.app/
+**GitHub Pages (testing on `pages` branch):** https://bidhya.github.io/polenet/
 
 ---
 
@@ -61,7 +62,8 @@ mamba run python scraper/fetch_live_uploads.py  # Step 7 — pull missing images
 | Branch | Purpose |
 |--------|---------|
 | `dev` | Active development — auto-deploys to Netlify preview |
-| `main` | Production — deploy paused until polenet.org is ready to go live |
+| `main` | Production — deploy paused until polenet.org is ready to go live; also drives GitHub Pages via `.github/workflows/pages.yml` |
+| `pages` | GitHub Pages testing/iteration — branched off `main`, kept separate so `dev` stays untouched while working out Pages-specific issues |
 
 ---
 
