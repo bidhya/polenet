@@ -174,7 +174,7 @@ def xml_to_html(content: str, depth: int = 0, page_slug: str = "") -> str:
     Prepare XML-parsed page/post content for use at a given site depth.
 
     - depth=0: root pages (index.html, about.html, ...)
-    - depth=2: subdirectory pages (blog/x.html, sites/x.html, ...)
+    - depth=1: subdirectory pages (blog/x.html, sites/x.html, ...)
 
     Actions:
     - Rewrite src="images/..." and href="images/..." for the correct depth
@@ -689,7 +689,7 @@ def build_site_detail_pages(real_sites):
                     img_candidates = list(ARCHIVE_IMG.glob(f"{sid}*.jpg"))
                 if img_candidates:
                     img_fname = img_candidates[0].name
-                    img_html = f'<div class="site-photo"><img src="../../images/{img_fname}" alt="{title}" loading="lazy"></div>'
+                    img_html = f'<div class="site-photo"><img src="../images/{img_fname}" alt="{title}" loading="lazy"></div>'
         except Exception:
             pass
 
@@ -721,7 +721,7 @@ def build_site_detail_pages(real_sites):
     </div>"""
 
         out = sites_dir / f"{sid}.html"
-        out.write_text(page(title, "Sites and Data", body, depth=2), encoding="utf-8")
+        out.write_text(page(title, "Sites and Data", body, depth=1), encoding="utf-8")
 
     print(f"  ✓ sites/{{}}.html  ({len(real_sites)} pages generated)".format("*"))
 
@@ -799,7 +799,7 @@ def build_training_schools():
         # Prefer XML content
         page_data = XML_PAGES.get(slug)
         if page_data and page_data['has_content']:
-            inner = xml_to_html(page_data['content'], depth=2, page_slug=slug)
+            inner = xml_to_html(page_data['content'], depth=1, page_slug=slug)
             if slug == "2015-gia-training-school":
                 # Stray literal "test" in the original WordPress content, right after
                 # the last lecture link — an editing leftover, not real content (Q11).
@@ -810,7 +810,6 @@ def build_training_schools():
                 ts    = load(slug)
                 el    = main_content(ts)
                 inner = page_text(ts, el)
-                inner = re.sub(r'\.\./images/', '../../images/', inner)
                 t = ts.title.text if ts.title else label
                 title_text = re.sub(r'\s*\|.*$', '', t).strip()
             except FileNotFoundError:
@@ -823,7 +822,7 @@ def build_training_schools():
     <h1 class="page-title">{t}</h1>
     <div class="entry-body">{inner}</div>"""
         (training_dir / f"{slug}.html").write_text(
-            page(t, "Training Schools", bdy, depth=2), encoding="utf-8"
+            page(t, "Training Schools", bdy, depth=1), encoding="utf-8"
         )
     print(f"  ✓ training/*.html  ({len(training_slugs)} pages)")
 
@@ -874,7 +873,7 @@ def build_blog():
         slug     = post['slug']
         title    = post['title']
         date_str = post.get('date', '')
-        content  = xml_to_html(post.get('content', ''), depth=2, page_slug=slug)
+        content  = xml_to_html(post.get('content', ''), depth=1, page_slug=slug)
 
         # Excerpt from first non-empty paragraph
         soup_ex   = BeautifulSoup(content, 'lxml')
@@ -889,7 +888,7 @@ def build_blog():
     </div>
     <div class="entry-body">{content}</div>"""
         (blog_dir / f"{slug}.html").write_text(
-            page(title, "Blog", bdy, depth=2), encoding="utf-8"
+            page(title, "Blog", bdy, depth=1), encoding="utf-8"
         )
         index_items += f"""
       <li>
@@ -904,7 +903,7 @@ def build_blog():
     <ul class="post-list">{index_items}
     </ul>"""
     (blog_dir / "index.html").write_text(
-        page("Blog", "Blog", index_body, depth=2), encoding="utf-8"
+        page("Blog", "Blog", index_body, depth=1), encoding="utf-8"
     )
     print(f"  ✓ blog/index.html + {built} post pages")
 
