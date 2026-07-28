@@ -20,7 +20,7 @@ import json
 import shutil
 import warnings
 from pathlib import Path
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup, NavigableString, XMLParsedAsHTMLWarning
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
@@ -908,6 +908,40 @@ def build_blog():
     print(f"  ✓ blog/index.html + {built} post pages")
 
 
+def _fix_in_the_news_links(html: str) -> str:
+    """Normalize inconsistent external-link styling on the "In the News" page.
+
+    Older entries print the raw URL as the link text and stay in the same tab;
+    newer entries use a short label ("Read more »" / "Listen now »") and open in
+    a new tab. Standardize every external link on the newer, preferred style —
+    internal links (to our own built pages) are left untouched, since same-tab
+    is correct for those. See docs/wishlist.md item 3.
+    """
+    soup = BeautifulSoup(html, "lxml")
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        if not href.startswith(("http://", "https://")):
+            continue  # internal link — leave text and same-tab behavior as-is
+        text = a.get_text(strip=True)
+        if text.rstrip("/") == href.rstrip("/"):
+            # Raw URL used as the link text — swap in a clean label, and drop
+            # the now-redundant "Read more at:" that precedes it, if present.
+            prev = a.previous_sibling
+            if isinstance(prev, NavigableString):
+                cleaned = re.sub(r"Read more at:\s*$", "", str(prev), flags=re.IGNORECASE)
+                if cleaned != str(prev):
+                    prev.replace_with(cleaned)
+            a.string = "Read more »"
+        rel = a.get("rel", [])
+        if isinstance(rel, str):
+            rel = rel.split()
+        if "noopener" not in rel:
+            rel.append("noopener")
+        a["rel"] = rel
+        a["target"] = "_blank"
+    return soup.body.decode_contents()
+
+
 def build_extra_pages():
     """Build extra pages from XML that don't appear in the main nav."""
     built = 0
@@ -917,6 +951,8 @@ def build_extra_pages():
             print(f"  ○ skipped (not in XML): {slug}")
             continue
         content = xml_to_html(page_data['content'], depth=0, page_slug=slug)
+        if slug == "in-the-news":
+            content = _fix_in_the_news_links(content)
         body = f"""
     <h1 class="page-title">{title}</h1>
     <div class="entry-body">{content}</div>"""

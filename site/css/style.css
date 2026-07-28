@@ -163,6 +163,18 @@ a:hover { color: var(--blue-lt); text-decoration: underline; }
 .entry-body li { margin-bottom: 0.3rem; }
 .entry-body a  { color: var(--blue); }
 
+/* Responsive video embeds — the iframe's width/height HTML attributes are a
+   sizing hint for browsers, but "height: auto" alone doesn't preserve an
+   iframe's aspect ratio the way it does for <img>, so set it explicitly to
+   avoid a squashed video on narrow screens. */
+.wp-block-embed-youtube { max-width: 560px; margin: 0 0 1.1rem; }
+.wp-block-embed-youtube iframe {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 560 / 315;
+  height: auto;
+}
+
 /* --------------------------------------------------------------------------
    Blog post list
    -------------------------------------------------------------------------- */
