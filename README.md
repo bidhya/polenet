@@ -3,8 +3,8 @@
 A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network). The original WordPress site's Aries theme broke and stopped rendering; the underlying WordPress database and media library are still intact and reachable, but the goal is to migrate off WordPress/Aries entirely rather than just fix the theme. Built from a WordPress XML export plus the Internet Archive as a fallback/design reference.
 
 **Live previews:**
+- GitHub Pages (`pages` branch, primary dev target): https://bidhya.github.io/polenet/
 - Netlify (`dev` branch): https://monumental-dieffenbachia-d72518.netlify.app/
-- GitHub Pages (testing on `pages` branch): https://bidhya.github.io/polenet/
 
 ---
 
@@ -40,8 +40,10 @@ Netlify is configured via `netlify.toml` to publish from `site/`.
 mamba run python scraper/build_site.py   # regenerate site/
 git add site/
 git commit -m "your change"
-git push origin dev            # Netlify auto-deploys
+git push origin pages          # GitHub Actions auto-deploys to bidhya.github.io/polenet
 ```
+Once it looks good there, promote it: `pages` → `dev` (Netlify preview) → `main` (stable
+anchor). See **Branches** below and `docs/deployment.md` for the full promotion workflow.
 
 ### Rebuild from scratch (fresh clone)
 ```bash
@@ -60,11 +62,13 @@ mamba run python scraper/fetch_live_uploads.py  # Step 7 — pull missing images
 
 ## Branches
 
+Three-tier promotion pipeline — work flows one direction only: `pages` → `dev` → `main`.
+
 | Branch | Purpose |
 |--------|---------|
-| `dev` | Active development — auto-deploys to Netlify preview |
-| `main` | Production — deploy paused until polenet.org is ready to go live; also drives GitHub Pages via `.github/workflows/pages.yml` |
-| `pages` | GitHub Pages testing/iteration — branched off `main`, kept separate so `dev` stays untouched while working out Pages-specific issues |
+| `pages` | Primary development branch — push freely, auto-deploys to GitHub Pages (free/unlimited on public repos, so no cost concern) |
+| `dev` | Merge from `pages` once it looks stable — auto-deploys to Netlify preview |
+| `main` | Merge from `dev` once *that* looks stable — production-track, but deploy paused until polenet.org is ready to go live |
 
 ---
 
