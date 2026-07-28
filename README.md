@@ -12,7 +12,7 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 
 | Directory | Contents |
 |-----------|----------|
-| `site/` | The deployable website (104 HTML pages, CSS, 429 images/PDFs) |
+| `site/` | The deployable website (115 HTML pages, CSS, 539 images/PDFs) |
 | `scraper/` | Python scripts to crawl the archive and build the site |
 | `archive/audit/` | Station index JSON + audit reports (source data) |
 | `docs/` | Project notes, decisions, deployment plan |
