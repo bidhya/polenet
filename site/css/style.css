@@ -343,6 +343,9 @@ a:hover { color: var(--blue-lt); text-decoration: underline; }
 #site-footer a { color: rgba(255,255,255,.75); text-decoration: none; }
 #site-footer a:hover { color: var(--white); }
 .footer-links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+.site-credit { color: rgba(255,255,255,.4); font-size: 0.78rem; }
+.site-credit a { color: rgba(255,255,255,.55); }
+.site-credit a:hover { color: var(--white); }
 .social-icons { display: flex; gap: 0.75rem; align-items: center; }
 .social-icons img { height: 22px; width: auto; opacity: 0.7; transition: opacity 0.15s; filter: brightness(0) invert(1); }
 .social-icons img:hover { opacity: 1; }

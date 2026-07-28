@@ -341,6 +341,7 @@ def page(title: str, active: str, body: str, depth: int = 0) -> str:
       <a href="{prefix}publications.html">Publications</a>
       <a href="{prefix}blog/index.html">Blog</a>
       <a href="{prefix}links.html">Links</a>
+      <span class="site-credit">Webmaster: <a href="https://bidhya.github.io/" target="_blank" rel="noopener">Bidhya</a></span>
     </div>
     <!-- Facebook/YouTube links removed 2026-07-28 per colleague: accounts are inactive,
          no login access to delete them, do not link to them from the site.
