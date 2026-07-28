@@ -342,6 +342,9 @@ def page(title: str, active: str, body: str, depth: int = 0) -> str:
       <a href="{prefix}blog/index.html">Blog</a>
       <a href="{prefix}links.html">Links</a>
     </div>
+    <!-- Facebook/YouTube links removed 2026-07-28 per colleague: accounts are inactive,
+         no login access to delete them, do not link to them from the site.
+         Left commented out (not deleted) in case active accounts replace them later.
     <div class="social-icons">
       <a href="https://www.facebook.com/polenet" target="_blank" rel="noopener">
         <img src="{fb_src}" alt="Facebook">
@@ -350,6 +353,7 @@ def page(title: str, active: str, body: str, depth: int = 0) -> str:
         <img src="{yt_src}" alt="YouTube">
       </a>
     </div>
+    -->
   </div>
 </footer>
 
