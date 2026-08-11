@@ -27,6 +27,25 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 
 ---
 
+## How this works
+
+`site/` is generated **locally** and committed as finished HTML — git stores the output, not a
+recipe. Neither host builds anything: the GitHub Actions workflow and Netlify both just serve the
+committed `site/` folder verbatim (no build command, no Python in CI).
+
+```
+build locally  →  commit site/  →  push  →  host serves it
+```
+
+**Consequence worth knowing:** editing `scraper/build_site.py` alone changes nothing live. You have
+to re-run the build and commit the resulting `site/` diff. Push the Python by itself and Netlify
+skips the deploy outright — its `ignore` rule sees `site/` unchanged.
+
+This is also why `site/` works as a standalone handover: it's the finished artifact, not an
+intermediate. Point any static host at it and you're done.
+
+---
+
 ## Quickstart
 
 ### View or deploy the site
