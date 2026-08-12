@@ -13,17 +13,20 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 | Directory | Contents |
 |-----------|----------|
 | `site/` | The deployable website (115 HTML pages, CSS, 539 images/PDFs) |
-| `scraper/` | Python scripts to crawl the archive and build the site |
-| `archive/audit/` | Station index JSON + audit reports (source data) |
-| `docs/` | Project notes, decisions, deployment plan |
+| `scraper/` | Python scripts that build the site |
+| `archive/html/` | Archived source pages the builder reads |
+| `archive/xml/` | Parsed WordPress export — the primary content source |
+| `archive/audit/` | Station index JSON + audit reports |
 
-> `archive/html/` and `archive/images/` are gitignored — too large to commit.
-> See **Rebuild from scratch** below if you need them.
+> **Everything needed to rebuild the site is committed.** Clone and run
+> `scraper/build_site.py` — see **Rebuild** below.
+>
+> `archive/images/` is gitignored, but the build does not need it: `site/images/` holds the
+> same files and is committed.
 >
 > 35 videos referenced in the original content are embedded via YouTube (currently the
 > project owner's personal account, Unlisted, as an interim solution) rather than committed
-> as files. Migrating to the official POLENET channel once access is confirmed is still owed —
-> see `docs/questions.md` Q12 if you're picking this up.
+> as files. Migrating to the official POLENET channel once access is confirmed is still owed.
 
 ---
 
@@ -68,18 +71,29 @@ git checkout main && git merge dev --ff-only && git push origin main
 ```
 See **Branches** below and `docs/deployment.md` for the full promotion workflow.
 
-### Rebuild from scratch (fresh clone)
+### Rebuild (fresh clone)
+Two commands. Everything the builder reads is committed:
 ```bash
 pip install -r scraper/requirements.txt
-mamba run python scraper/fetch_archive.py   # Step 1 — Wayback homepage/images (historical)
-mamba run python scraper/crawl_site.py      # Step 2 — full Wayback crawl (historical, ~15 min)
-mamba run python scraper/audit.py           # Step 3 — classify pages (historical)
-mamba run python scraper/parse_xml.py       # Step 6 — WordPress XML export → archive/xml/*.json
-                                             #   (needs Scratch/*.xml — gitignored, ask for a copy)
-mamba run python scraper/build_site.py      # Step 4/6 → generates site/
-mamba run python scraper/fetch_live_uploads.py  # Step 7 — pull missing images/PDFs from the
-                                                 #   live polenet.org server, then re-run build_site.py
+mamba run python scraper/build_site.py      # regenerates all 115 pages in site/
 ```
+This reproduces `site/` byte-for-byte — `git status` should come back clean afterwards. If it
+doesn't, something genuinely changed. Sanity check: `grep -c 'class="glightbox' site/photos.html`
+returns **160**. The build refuses to run rather than emit an empty gallery, so a missing-asset
+failure stops loudly instead of shipping a broken site.
+
+<details>
+<summary>Historical / one-off scripts (not needed for a normal rebuild)</summary>
+
+```bash
+mamba run python scraper/parse_xml.py       # WordPress export → archive/xml/*.json
+                                             #   output is already committed; needs Scratch/*.xml
+mamba run python scraper/fetch_archive.py   # original Wayback capture
+mamba run python scraper/crawl_site.py      # original full Wayback crawl (~15 min)
+mamba run python scraper/audit.py           # page classification → archive/audit/
+mamba run python scraper/fetch_live_uploads.py  # one-off media recovery from the original server
+```
+</details>
 
 ---
 
