@@ -762,10 +762,13 @@ def build_site_detail_pages(real_sites):
                     # clean_html() always emits root-relative "images/..." paths;
                     # this page is depth=1 (site/sites/{sid}.html), so correct for it.
                     desc_html = desc_html.replace('src="images/', 'src="../images/')
-                # Look for a photo matching station ID
-                img_candidates = list(ARCHIVE_IMG.glob(f"{sid}-*.jpg")) + list(ARCHIVE_IMG.glob(f"{sid}_*.jpg"))
+                # Look for a photo matching station ID.
+                # Reads SITE_IMG (committed) rather than ARCHIVE_IMG (gitignored) so the build
+                # works from a fresh clone — copy_images() runs first, so both hold the same
+                # files. See docs/BUILD-REPRODUCIBILITY-WARNING.md.
+                img_candidates = list(SITE_IMG.glob(f"{sid}-*.jpg")) + list(SITE_IMG.glob(f"{sid}_*.jpg"))
                 if not img_candidates:
-                    img_candidates = list(ARCHIVE_IMG.glob(f"{sid}*.jpg"))
+                    img_candidates = list(SITE_IMG.glob(f"{sid}*.jpg"))
                 if img_candidates:
                     img_fname = img_candidates[0].name
                     img_html = f'<div class="site-photo"><img src="../images/{img_fname}" alt="{title}" loading="lazy"></div>'
@@ -807,8 +810,10 @@ def build_site_detail_pages(real_sites):
 
 def build_photos():
     """Photo gallery with GLightbox."""
-    # Collect gallery images: full-size images from gallery folder
-    gallery_imgs = sorted(ARCHIVE_IMG.glob("*.jpg"))
+    # Collect gallery images from SITE_IMG (committed) rather than ARCHIVE_IMG (gitignored),
+    # so a fresh clone can rebuild. copy_images() runs before this, so when archive/images/
+    # IS present its contents are already mirrored here.
+    gallery_imgs = sorted(SITE_IMG.glob("*.jpg"))
     # Exclude known non-gallery images
     exclude = {"facebook.png","youtube.png","polenet2.jpg","touch-icon.png"}
     exclude_patterns = ["home_page","group_photo","photos.jpg","72.jpg"]
@@ -817,6 +822,17 @@ def build_photos():
         if f.name not in exclude and not any(p in f.name for p in exclude_patterns)
         and not f.name.startswith("thumbs_")
     ]
+
+    # Fail loudly rather than silently shipping an empty gallery. Before this guard, a missing
+    # image source produced a successful build with 0 gallery images and 43 station pages
+    # stripped of photos, with no warning. See docs/BUILD-REPRODUCIBILITY-WARNING.md.
+    if not gallery_imgs:
+        raise SystemExit(
+            "\nFATAL: photo gallery would be empty — 0 images found in "
+            f"{SITE_IMG}.\n"
+            "Expected ~160. This usually means site/images/ is missing or empty.\n"
+            "Refusing to build a silently-broken site. Nothing was written."
+        )
 
     grid_items = ""
     for img in gallery_imgs:
@@ -1053,6 +1069,12 @@ def copy_images():
     subfolders — organized 2026-07-28, see docs/discovery-log.md) into site/images/,
     flattened, since every built page's image/PDF links assume a flat images/ path."""
     SITE_IMG.mkdir(exist_ok=True)
+    # archive/images/ is gitignored, so it is absent on a fresh clone. That is fine: site/images/
+    # is committed and already holds every non-video file. Skip rather than crash.
+    if not ARCHIVE_IMG.is_dir():
+        print(f"  ○ archive/images/ not present — using the {len(list(SITE_IMG.iterdir()))} "
+              "committed files in site/images/ as-is")
+        return
     copied = 0
     skipped_videos = 0
     for f in ARCHIVE_IMG.rglob("*"):

@@ -1,5 +1,4 @@
 # Raw Wayback Machine downloads — large, re-creatable, not needed in git
-archive/html/
 archive/images/
 archive/assets/
 
@@ -18,3 +17,8 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# archive/html/ is tracked so the build works from a fresh clone, EXCEPT:
+# the captured wp-login page — unreferenced by the build, and not something to
+# publish in a public repo (see AGENTS.md SECURITY POSTURE).
+archive/html/wp-login-php.html
