@@ -2,8 +2,12 @@
 archive/images/
 archive/assets/
 
-# Internal docs / agent context — not needed in the deployed repo
-docs/
+# Project docs: four are published, the rest are the maintainer's working notes
+docs/*
+!docs/handover.md
+!docs/project-report.md
+!docs/deployment.md
+!docs/notes.md
 AGENTS.md
 CLAUDE.md
 Scratch/
@@ -21,5 +25,5 @@ Thumbs.db
 
 # archive/html/ is tracked so the build works from a fresh clone, EXCEPT:
 # the captured wp-login page — unreferenced by the build, and not something to
-# publish in a public repo (see AGENTS.md SECURITY POSTURE).
+# publish in a public repo.
 archive/html/wp-login-php.html
