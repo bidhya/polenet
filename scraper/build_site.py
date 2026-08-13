@@ -357,12 +357,24 @@ def nav_html(active: str, depth: int = 0) -> str:
     return "<ul>\n      " + "\n      ".join(items) + "\n    </ul>"
 
 
+# Footer social icons: intentionally absent — do not add them back.
+#
+# The previously linked social profiles are not maintained as part of this site, and the old
+# URLs no longer resolve to anything the project publishes. Linking to them would send visitors
+# somewhere unintended, so they were removed rather than updated. Any future social links should
+# be written fresh, from destinations confirmed by the project team at that time.
+#
+# Deleted outright rather than commented out. An earlier pass kept the markup in a comment, and
+# the stale URLs then shipped inside every generated page — where a later review mistook them
+# for live links. Dead markup left "just in case" costs more confusion than it saves.
+#
+# site/images/facebook.png and youtube.png are deliberately left in place but unreferenced:
+# removing them would change the committed asset count for no benefit. They stay in the gallery
+# exclude list in build_photos() so they never surface in the photo grid.
 def page(title: str, active: str, body: str, depth: int = 0) -> str:
     prefix   = "../" * depth
     css_path = f"{prefix}css/style.css"
     logo_src = f"{prefix}images/polenet2.jpg"
-    fb_src   = f"{prefix}images/facebook.png"
-    yt_src   = f"{prefix}images/youtube.png"
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -406,18 +418,7 @@ def page(title: str, active: str, body: str, depth: int = 0) -> str:
       <a href="{prefix}links.html">Links</a>
       <span class="site-credit"><a href="https://bidhya.github.io/" target="_blank" rel="noopener">Webmaster</a></span>
     </div>
-    <!-- Facebook/YouTube links removed 2026-07-28 per colleague: accounts are inactive,
-         no login access to delete them, do not link to them from the site.
-         Left commented out (not deleted) in case active accounts replace them later.
-    <div class="social-icons">
-      <a href="https://www.facebook.com/polenet" target="_blank" rel="noopener">
-        <img src="{fb_src}" alt="Facebook">
-      </a>
-      <a href="https://www.youtube.com/user/polenet" target="_blank" rel="noopener">
-        <img src="{yt_src}" alt="YouTube">
-      </a>
-    </div>
-    -->
+    <!-- No social icons here by design. See the note in build_site.py above this footer. -->
   </div>
 </footer>
 
@@ -841,13 +842,15 @@ def build_photos():
         <img src="images/{img.name}" alt="" loading="lazy">
       </a>"""
 
+    # GLightbox is pinned to an exact version on purpose — an unpinned jsdelivr path resolves to
+    # whatever is latest, so a future major release could break this gallery with no change here.
     body = f"""
     <h1 class="page-title">Photos</h1>
     <p class="gallery-intro">Field photos from POLENET monitoring station installations and operations across Antarctica and Greenland.</p>
     <div class="photo-grid">{grid_items}
     </div>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.1/dist/css/glightbox.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.1/dist/js/glightbox.min.js"></script>
     <script>GLightbox({{ selector: '.glightbox' }});</script>"""
 
     out = SITE_DIR / "photos.html"
