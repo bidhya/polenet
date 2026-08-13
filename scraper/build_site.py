@@ -19,6 +19,7 @@ import re
 import json
 import shutil
 import warnings
+from html import escape
 from pathlib import Path
 from bs4 import BeautifulSoup, NavigableString, XMLParsedAsHTMLWarning
 
@@ -35,6 +36,11 @@ XML_DIR      = BASE_DIR / "archive" / "xml"
 SITE_DIR     = BASE_DIR / "site"
 SITE_IMG     = SITE_DIR / "images"
 SITE_CSS     = SITE_DIR / "css"
+
+# Absolute base URL of the deployed site, used only for sitemap.xml and robots.txt — the pages
+# themselves stay entirely relative, so nothing else depends on this being right. Must end in a
+# slash. Change this ONE line if the site ever moves to its own domain, then rebuild.
+SITE_BASE_URL = "https://bidhya.github.io/polenet/"
 
 # ---------------------------------------------------------------------------
 # XML data (populated in main)
@@ -357,6 +363,33 @@ def nav_html(active: str, depth: int = 0) -> str:
     return "<ul>\n      " + "\n      ".join(items) + "\n    </ul>"
 
 
+_DEFAULT_DESC = ("POLENET — The Polar Earth Observing Network: GPS and seismic observation of "
+                 "the polar regions of Antarctica and Greenland.")
+
+
+def meta_description(body: str) -> str:
+    """Derive a search-result snippet from a page's own body content.
+
+    Taken from the body rather than written by hand because there are 115 pages. Three things are
+    dropped before the text is read: the <h1>, which repeats the <title> and would waste the
+    snippet; <script>/<style>, so JavaScript never leaks in (the photo gallery's inline GLightbox
+    call lives in the body); and a.back-link, the "Back to …" navigation that opens the body on 86
+    pages and would otherwise begin every one of their snippets. Falls back to a site-level
+    description when a page has too little prose to summarise.
+    """
+    soup = BeautifulSoup(body, "lxml")
+    for tag in soup.find_all(["script", "style"]):
+        tag.decompose()
+    for tag in soup.select("h1, a.back-link"):
+        tag.decompose()
+    text = " ".join(soup.get_text(" ", strip=True).split())
+    if len(text) < 40:
+        text = _DEFAULT_DESC
+    if len(text) > 155:
+        text = text[:155].rsplit(" ", 1)[0].rstrip(" ,;:.—–-") + "…"
+    return escape(text, quote=True)
+
+
 # Footer social icons: intentionally absent — do not add them back.
 #
 # The previously linked social profiles are not maintained as part of this site, and the old
@@ -380,6 +413,7 @@ def page(title: str, active: str, body: str, depth: int = 0) -> str:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{meta_description(body)}">
   <title>{title} | POLENET: The Polar Earth Observing Network</title>
   <link rel="stylesheet" href="{css_path}">
 </head>
@@ -1097,6 +1131,38 @@ def copy_images():
 # Main
 # ---------------------------------------------------------------------------
 
+def build_sitemap():
+    """Write sitemap.xml and robots.txt. Must run after every page exists — it walks the output.
+
+    No <lastmod>: it would have to come from file mtimes, which change on every build and would
+    break the byte-identical-rebuild guarantee for no real benefit. Search engines re-crawl on
+    their own schedule regardless.
+
+    Note that robots.txt is only honoured at a domain root. While the site is served from a
+    project subpath it is inert — harmless, and correct the moment the site moves to its own
+    domain. sitemap.xml works either way and can be submitted directly to a search console.
+    """
+    pages = sorted(p.relative_to(SITE_DIR).as_posix() for p in SITE_DIR.rglob("*.html"))
+
+    urls = []
+    for rel in pages:
+        loc = SITE_BASE_URL if rel == "index.html" else SITE_BASE_URL + rel
+        urls.append(f"  <url><loc>{escape(loc, quote=False)}</loc></url>")
+
+    sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+               + "\n".join(urls) + "\n</urlset>\n")
+    (SITE_DIR / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+
+    robots = ("User-agent: *\n"
+              "Allow: /\n\n"
+              f"Sitemap: {SITE_BASE_URL}sitemap.xml\n")
+    (SITE_DIR / "robots.txt").write_text(robots, encoding="utf-8")
+
+    print(f"  ✓ sitemap.xml  ({len(urls)} URLs)")
+    print(f"  ✓ robots.txt   (points at {SITE_BASE_URL}sitemap.xml)")
+
+
 def main():
     print("=" * 55)
     print("  polenet.org Site Builder  |  Step 4/6")
@@ -1138,6 +1204,10 @@ def main():
     video_out = XML_DIR / "video_placements.json"
     video_out.write_text(json.dumps(VIDEO_PLACEMENTS, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"  ✓ {len(VIDEO_PLACEMENTS)} video placements → {video_out.relative_to(BASE_DIR)}")
+
+    # Must come last — it walks site/ for the pages the steps above just wrote
+    print("\n[Search discoverability]")
+    build_sitemap()
 
     print("\n" + "=" * 55)
     print("Build complete.")
