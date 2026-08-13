@@ -81,8 +81,14 @@ Data, Links from the footer, and the 3 field-season pages are pinned atop the Bl
 ---
 
 ## Video migration playbook — the one substantial pending task
-Not blocking anything. Do this whenever the project confirms access to the
-official `youtube.com/user/polenet` channel. This can be executed end-to-end —
+Not blocking anything. Do this whenever the project confirms access to its official channel.
+
+> **First establish what that channel actually is.** The legacy `youtube.com/user/polenet`
+> address returns 404 — YouTube retired the `/user/` URL format, which is *not* the same as the
+> channel being gone. Nobody has confirmed the current address, so treat it as an open question
+> for the project team rather than guessing a replacement URL.
+
+Once the destination is known this can be executed end-to-end —
 it's the exact same pattern as the original personal-account upload, just pointed at a
 different channel. That original run is described in `docs/project-report.md` (Phase 7b–7c);
 the operational detail you actually need is in the steps below.
