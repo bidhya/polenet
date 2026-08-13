@@ -189,13 +189,27 @@ All of it is done — the full narrative lives in `docs/project-report.md`. The 
 
 ## Still open
 
-- [ ] **Connect the polenet.org custom domain.** Two unresolved parts: *which host* it should
-      point at, and *who owns* that decision and the DNS change. Neither is settled.
-      - If GitHub Pages: add the domain in repo Settings → Pages, then a `CNAME` file in `site/`
-        and a DNS `CNAME`/`ALIAS` at the registrar.
-      - If Netlify: Domain management → Add custom domain, point DNS at Netlify, and unpause
-        `main`'s deploy context (which is still paused).
-- [ ] **Unpause Netlify's `main` context** — only relevant if Netlify wins the domain decision.
+- [ ] **Connect the polenet.org custom domain.** *Which host* is now settled — **GitHub Pages**,
+      decided 2026-08-13. The deciding factor is handover rather than technical merit: Pages is
+      tied to the repository and travels with it, whereas the Netlify deployment is tied to an
+      individual's personal account. Pages is also free and unmetered for public repos, already
+      configured (`.github/workflows/pages.yml`), and already serving `main`.
+      - Repo side, once the DNS side is agreed: `echo "polenet.org" > site/CNAME` (committed —
+        it is not generated, but it does survive rebuilds), then set the custom domain via
+        Settings → Pages or `gh api -X PUT repos/bidhya/polenet/pages -f cname=polenet.org`.
+        Wait for the Let's Encrypt certificate, then confirm HTTPS enforcement.
+      - Verification: request GitHub's `_github-pages-challenge-*` TXT record at the same time as
+        the address records. The token is available only through the GitHub web UI, so fetch it
+        *before* raising the DNS change.
+      - **What is still unresolved is the DNS change itself, which is not self-service for this
+        domain** — it goes through the organisation that administers the domain's DNS, on their
+        timescale. Treat it as lead-time work and put every record in a single request; a second
+        round trip costs another full turnaround. Details are held in the project's internal
+        notes rather than here.
+      - Verified: the site needs **no changes** to serve from a domain root — 0 root-relative
+        links, and `build_site.py` never wipes `site/`, so a committed `CNAME` file survives.
+- [ ] **Unpause Netlify's `main` context** — moot now that GitHub Pages is the chosen host for
+      the domain. Left open only as a fallback.
 
 ## Future reference — how to update the site
 
