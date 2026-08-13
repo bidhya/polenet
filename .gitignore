@@ -8,7 +8,8 @@ AGENTS.md
 CLAUDE.md
 Scratch/
 
-# Python
+# Python — uv manages the environment; the lockfile IS committed, the venv is not
+.venv/
 __pycache__/
 *.pyc
 *.pyo

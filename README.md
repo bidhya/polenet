@@ -17,9 +17,10 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 | `archive/html/` | Archived source pages the builder reads |
 | `archive/xml/` | Parsed WordPress export — the primary content source |
 | `archive/audit/` | Station index JSON + audit reports |
+| `pyproject.toml`, `uv.lock` | The three dependencies, and their pinned versions |
 
 > **Everything needed to rebuild the site is committed.** Clone and run
-> `scraper/build_site.py` — see **Rebuild** below.
+> `uv run python scraper/build_site.py` — see **Rebuild** below.
 >
 > `archive/images/` is gitignored, but the build does not need it: `site/images/` holds the
 > same files and is committed.
@@ -59,7 +60,7 @@ Netlify is configured via `netlify.toml` to publish from `site/`.
 ### Make a content change
 ```bash
 # Edit scraper/build_site.py, then:
-mamba run python scraper/build_site.py   # regenerate site/
+uv run python scraper/build_site.py      # regenerate site/
 git add site/
 git commit -m "your change"
 git push origin dev             # Netlify auto-deploys the preview
@@ -69,14 +70,17 @@ Once it looks good there, promote it:
 git checkout main && git merge dev --ff-only && git push origin main
 # GitHub Actions auto-deploys to bidhya.github.io/polenet
 ```
-See **Branches** below and `docs/deployment.md` for the full promotion workflow.
+See **Branches** below for the full promotion workflow.
 
 ### Rebuild (fresh clone)
-Two commands. Everything the builder reads is committed:
+Everything the builder reads is committed, so this is the whole rebuild:
 ```bash
-pip install -r scraper/requirements.txt
-mamba run python scraper/build_site.py      # regenerates all 115 pages in site/
+uv run python scraper/build_site.py         # regenerates all 115 pages in site/
 ```
+Dependencies are three ordinary libraries — `requests`, `beautifulsoup4`, `lxml` — declared in
+`pyproject.toml`. The commands here use [uv](https://docs.astral.sh/uv/) because it handles the
+interpreter and the dependencies in one step, but any Python tooling works; substitute your own
+and drop the `uv run` prefix.
 This reproduces `site/` byte-for-byte — `git status` should come back clean afterwards. If it
 doesn't, something genuinely changed. Sanity check: `grep -c 'class="glightbox' site/photos.html`
 returns **160**. The build refuses to run rather than emit an empty gallery, so a missing-asset
@@ -86,12 +90,12 @@ failure stops loudly instead of shipping a broken site.
 <summary>Historical / one-off scripts (not needed for a normal rebuild)</summary>
 
 ```bash
-mamba run python scraper/parse_xml.py       # WordPress export → archive/xml/*.json
-                                             #   output is already committed; needs Scratch/*.xml
-mamba run python scraper/fetch_archive.py   # original Wayback capture
-mamba run python scraper/crawl_site.py      # original full Wayback crawl (~15 min)
-mamba run python scraper/audit.py           # page classification → archive/audit/
-mamba run python scraper/fetch_live_uploads.py  # one-off media recovery from the original server
+uv run python scraper/parse_xml.py          # WordPress export → archive/xml/*.json
+                                            #   output is already committed; needs Scratch/*.xml
+uv run python scraper/fetch_archive.py      # original Wayback capture
+uv run python scraper/crawl_site.py         # original full Wayback crawl (~15 min)
+uv run python scraper/audit.py              # page classification → archive/audit/
+uv run python scraper/fetch_live_uploads.py # one-off media recovery from the original server
 ```
 </details>
 
@@ -110,6 +114,9 @@ Two-tier model — work flows one direction: `dev` → `main`.
 
 ## Further reading
 
-- `docs/todo.md` — current status and next steps
-- `docs/deployment.md` — Netlify setup, branch strategy, domain connection
-- `AGENTS.md` — full project context for AI-assisted development
+Everything needed to build, host and understand the site is in this repo. The project's
+working notes — the full rebuild narrative, deployment detail, and a handover guide — are kept
+outside it by the maintainer; ask if you need them.
+
+- `site/README.md` — note on the generated output
+- `pyproject.toml` — the three dependencies
