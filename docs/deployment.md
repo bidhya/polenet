@@ -190,7 +190,7 @@ All of it is done — the full narrative lives in `docs/project-report.md`. The 
 ## Still open
 
 - [ ] **Connect the polenet.org custom domain.** *Which host* is now settled — **GitHub Pages**,
-      decided 2026-08-13. The deciding factor is handover rather than technical merit: Pages is
+      decided 2026-08-14. The deciding factor is handover rather than technical merit: Pages is
       tied to the repository and travels with it, whereas the Netlify deployment is tied to an
       individual's personal account. Pages is also free and unmetered for public repos, already
       configured (`.github/workflows/pages.yml`), and already serving `main`.
