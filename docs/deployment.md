@@ -1,6 +1,6 @@
 # Deployment Plan — polenet.org
 
-Last updated: 2026-08-12
+Last updated: 2026-08-17
 
 ---
 
@@ -210,6 +210,11 @@ All of it is done — the full narrative lives in `docs/project-report.md`. The 
         links, and `build_site.py` never wipes `site/`, so a committed `CNAME` file survives.
 - [ ] **Unpause Netlify's `main` context** — moot now that GitHub Pages is the chosen host for
       the domain. Left open only as a fallback.
+
+> **Neither item above is scheduled.** The host preference is settled, but nobody has asked for
+> the domain to be moved and nothing depends on it — the site is live and working at
+> `bidhya.github.io/polenet/` either way. They are recorded so the reasoning is not lost, not
+> because they are queued.
 
 ## Future reference — how to update the site
 

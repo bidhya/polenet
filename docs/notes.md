@@ -177,8 +177,12 @@ run `uv run python scraper/build_site.py`, and commit the map plus the three reg
 
 **Rollback:** `archive/xml/video_url_map.personal-backup.json` holds the previous, verified URL
 set from before the 2026-08-17 migration. Restoring it and rebuilding returns the site to the
-earlier hosting. Keep it until the current videos have been confirmed playing on the live site
-for a while.
+earlier hosting.
+
+Its protective purpose is now **discharged** — the migrated videos were confirmed playing on the
+live production site on 2026-08-17, so the earlier copies are no longer load-bearing and can be
+retired whenever their owner chooses. The file itself is kept as a record of what the mapping
+was; it costs nothing and it is the only remaining trace of the previous URLs.
 
 ### Verification after any video change
 
