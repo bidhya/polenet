@@ -9,6 +9,10 @@ docs/*
 !docs/deployment.md
 !docs/notes.md
 AGENTS.md
+
+# Local-only map of the whole folder — describes gitignored material, so it
+# would be misleading in a clone. README.md is the repository's front door.
+START-HERE.md
 CLAUDE.md
 Scratch/
 
