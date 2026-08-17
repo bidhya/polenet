@@ -15,11 +15,14 @@ legacy installation.*
 
 That is everything. No other accounts, credentials, or third-party access is required.
 
-**Simplest option: send the whole project folder.** A copy of the working directory contains all
-three of the above plus the 554 MB of original video files, and nothing in it is secret — no
-credentials, tokens or passwords, by standing project rule. The one constraint is on where it
-goes, not who gets it: the export holds third-party personal data, so a direct handover to a
-named person is fine and a public location is not.
+**Simplest option: send the whole project folder.** It contains all three of the above plus the
+554 MB of original video files, and nothing in it is secret — no credentials, tokens or
+passwords, by standing project rule. Skip `.venv/`; it is a throwaway Python environment that
+`uv sync` recreates. Everything else travels.
+
+The only thing to keep in mind is *where* the copy lives rather than who reads it: the export
+carries a few third-party email and IP addresses from the original site's comments, so a direct
+transfer or a private drive is right, and a public or indexable location is not.
 
 ---
 
