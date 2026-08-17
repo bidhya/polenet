@@ -10,10 +10,16 @@ legacy installation.*
 | Hand over | How |
 |---|---|
 | The repository | Public — just send the link: `https://github.com/bidhya/polenet` |
-| The WordPress XML export (13 MB) | **Privately** — file transfer or email, never via the repo |
+| The WordPress XML export (13 MB) | Any direct transfer. Not through the repo — see below |
 | `docs/` (or at minimum `docs/project-report.md`) | Directly — it is gitignored, so not in the repo |
 
 That is everything. No other accounts, credentials, or third-party access is required.
+
+**Simplest option: send the whole project folder.** A copy of the working directory contains all
+three of the above plus the 554 MB of original video files, and nothing in it is secret — no
+credentials, tokens or passwords, by standing project rule. The one constraint is on where it
+goes, not who gets it: the export holds third-party personal data, so a direct handover to a
+named person is fine and a public location is not.
 
 ---
 
@@ -81,11 +87,13 @@ Two reasons, and neither is required for a normal rebuild:
 
 **Why it is not in the repository:** a WordPress export contains more than the visible content.
 This one holds 3 author email addresses, 3 WordPress usernames, 5 commenter email addresses,
-5 commenter IP addresses, and 19 draft or private posts that were never published. Publishing
-that would leak other people's personal data, so it is deliberately excluded and must be passed
-on privately. If it ever needs wider distribution, sanitize it first: strip every
-`wp:author_email`, `wp:author_login`, `wp:comment_author_email` and `wp:comment_author_IP`
-element, and drop any item whose `wp:status` is not `publish`.
+5 commenter IP addresses, and 19 draft or private posts that were never published. That is other
+people's data, so it stays out of a public repository — but handing the file directly to someone
+working on the project is exactly what it is for, and needs no ceremony.
+
+The line is *public versus not*, rather than who receives it. If it ever has to go somewhere open,
+sanitize first: strip every `wp:author_email`, `wp:author_login`, `wp:comment_author_email` and
+`wp:comment_author_IP` element, and drop any item whose `wp:status` is not `publish`.
 
 ---
 

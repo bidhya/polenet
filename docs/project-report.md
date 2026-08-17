@@ -285,7 +285,7 @@ theme. Rewriting history to remove a vendor name was judged disproportionate to 
 A third audit, run at handover time, checked the WordPress export and the committed artifacts
 for personal data. The export itself holds author and commenter email addresses, commenter IP
 addresses, WordPress usernames, and 19 unpublished draft/private posts — which is why it is
-excluded from the repository and passed on privately instead. The committed parsed JSON carries
+excluded from the repository and handed over directly instead. The committed parsed JSON carries
 none of it, and the handful of addresses that do appear in the built site are training-school
 organiser contacts that were public on the original site. **Exporting a CMS produces more than
 the content you can see** — publishing an export wholesale is a straightforward way to leak
