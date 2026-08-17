@@ -1,6 +1,6 @@
 # Handover — what a new developer needs
 
-*Last verified 2026-08-12. Safe to share as-is: no credentials, no operational detail about the
+*Last verified 2026-08-17. Safe to share as-is: no credentials, no operational detail about the
 legacy installation.*
 
 ---
@@ -106,11 +106,23 @@ Read `project-report.md` §10 first — the answer is counter-intuitive:
 
 ## Dependencies that travel with the site
 
-- **35 field videos are embedded from a personal YouTube account** (unlisted), as an interim
-  measure. Until they are moved to an institutional channel, the site depends on that individual
-  account. Swapping them is a find-and-replace in `archive/xml/video_url_map.json` followed by a
-  rebuild — the playbook is in `docs/notes.md`.
-- **The photo gallery loads GLightbox from a CDN**, the only external request the site makes.
+- **35 field videos are embedded from the project's YouTube channel**, POLENET Science
+  (`youtube.com/@polenetscience`), Unlisted. Migrated there on 2026-08-17, so the site no longer
+  depends on any individual's account. Replacing a video is a one-line change in
+  `archive/xml/video_url_map.json` followed by a rebuild. **`docs/notes.md`, "Videos", is the
+  reference to hand to whoever manages that channel** — it sets out what is safe to change
+  (visibility, titles, descriptions) and what silently breaks these pages (deleting a video, or
+  deleting and re-uploading it, which issues a new ID).
+- **The photo gallery loads GLightbox from a CDN** — the only third-party *code* the site runs
+  (the video iframes are the other external requests). It is **pinned to an exact version**,
+  `glightbox@3.3.1`, deliberately: an unpinned CDN path resolves to whatever is latest, so a
+  future major release could have broken the gallery with no change in this repository and nobody
+  watching. Keep it pinned.
+- **`SITE_BASE_URL` near the top of `build_site.py` is the only absolute URL the build emits.**
+  It feeds `sitemap.xml` and `robots.txt`; every link in the pages themselves is relative. **If
+  the site ever moves to another domain, change that one line and rebuild** — otherwise the
+  sitemap keeps advertising the old addresses to search engines. `robots.txt` is inert while the
+  site is served from a project subpath and becomes effective at a domain root.
 - **`site/README.md` says "do not edit files here directly."** True while the generator is in
   use, wrong for anyone handed `site/` as their source. Update it if the generator is abandoned.
 - **The site is generated, so hand-editing is a one-way door.** Navigation and footer are

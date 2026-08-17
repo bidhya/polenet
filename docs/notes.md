@@ -53,8 +53,8 @@ Data, Links from the footer, and the 3 field-season pages are pinned atop the Bl
 - `archive/xml/images_to_fetch.json` (134 entries) is now stale/historical — it predates
   the 2026-07-26 recount and recovery; not the current source of truth for anything
 - **Videos are separate:** 35 files (554 MB on disk) never copied to `site/images/` — they're
-  embedded via YouTube iframe instead (personal-account interim, Unlisted; official-channel
-  migration still owed — see the playbook at the end of this file).
+  embedded via YouTube iframe instead, from the project's own channel and Unlisted. See the
+  **"Videos"** section at the end of this file.
 
 ## Build Pipeline Scripts
 | Script | Purpose | Run order |

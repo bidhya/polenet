@@ -25,9 +25,11 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 > `archive/images/` is gitignored, but the build does not need it: `site/images/` holds the
 > same files and is committed.
 >
-> 35 videos referenced in the original content are embedded via YouTube (currently the
-> project owner's personal account, Unlisted, as an interim solution) rather than committed
-> as files. Migrating to the official POLENET channel once access is confirmed is still owed.
+> 35 videos referenced in the original content are embedded from the project's YouTube
+> channel, POLENET Science, rather than committed as files. They are Unlisted, which behaves
+> identically to Public for an embedded video and only keeps raw field clips off the channel's
+> browsable listing. See `docs/notes.md`, "Videos", for what can safely be changed on YouTube
+> without breaking these pages.
 
 ---
 

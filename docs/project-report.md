@@ -175,8 +175,22 @@ back to source files required care: upload titles were preserved as filenames, e
 page was fetched individually to read its real title, and each was checked for embeddability
 before being trusted. All 35 IDs were verified unique before commit.
 
-**This remains the one incomplete item.** The videos currently sit on a personal account as an
-interim measure; migration to the institutional channel is documented and pending access.
+**Completed 2026-08-17.** The videos initially sat on an interim account while the project's own
+channel was being identified. All 35 were then re-uploaded to **POLENET Science**
+(`youtube.com/@polenetscience`) and the map swapped over in four batches.
+
+Two things made that migration cheap, and both were design decisions taken earlier rather than
+luck. The map is keyed by filename and the build extracts the video ID from whatever URL form it
+finds, so **a half-migrated map is a valid map** — the batches could be verified and deployed
+independently, with no cutover moment. And because the build never validates URLs, nothing had to
+be coordinated with YouTube at build time. The previous URL set was kept intact as
+`video_url_map.personal-backup.json`, making the whole change reversible with one file copy and a
+rebuild.
+
+One wrinkle worth recording: YouTube rewrites uploaded titles, stripping extensions and turning
+`_`, `-` and `.` into spaces. Matching returned links back to source files therefore normalises
+both sides before comparing. That transformation was checked against all 35 filenames first and
+produced no collisions, so every video could be matched unambiguously.
 
 ### Phase 8: Second host and hardening (2026-07-28 → 2026-08-12)
 GitHub Pages was added as an independent second host once the repository was made public
@@ -364,8 +378,12 @@ Use the export as the import source and `site/` as the reference for correct out
 
 **Three things that will bite:**
 
-1. **Video embeds point at a personal account.** Until migrated, the site depends on an
-   individual's YouTube account. This is the first thing to resolve at handover.
+1. **Videos are embedded from a YouTube channel the site does not control.** Since 2026-08-17
+   that is the project's own channel rather than an individual's, which removed the sharpest
+   handover risk — but the dependency itself remains. The failure mode is silent: the build never
+   checks that a video still resolves, so deleting one, or deleting and re-uploading it (which
+   issues a new ID), breaks a page with no error anywhere. `docs/notes.md`, "Videos", is written
+   to be handed to whoever manages that channel.
 2. **`site/README.md` says "do not edit files here directly."** True while the generator is in
    use; wrong for anyone handed `site/` as their source. Update it at handover.
 3. **The site is generated, so hand-editing is a one-way door.** Navigation and footer are
