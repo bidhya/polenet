@@ -80,100 +80,107 @@ Data, Links from the footer, and the 3 field-season pages are pinned atop the Bl
 
 ---
 
-## Video migration playbook — the one substantial pending task
+## Videos — how they are hosted, and what is safe to change
 
-**Destination confirmed 2026-08-14:** the project's official channel is
-**POLENET Science** — `https://www.youtube.com/@polenetscience` (channel ID
-`UC_rZ7us194LIZ4PF3GaiiJQ`). It is live and already hosts a curated video series. This
-replaces the long-standing open question about the channel address; the legacy
-`youtube.com/user/polenet` form returns 404 only because YouTube retired the `/user/` URL
-format.
+**Status: complete.** All 35 videos were migrated to the project's official YouTube channel on
+2026-08-17. Nothing about the videos is outstanding.
 
-Nothing is blocked on this. The site works today. What follows is a plan that can be picked up,
-put down, and resumed weeks later without losing state.
+### Where they live
 
-### The property that makes this resumable
+| | |
+|---|---|
+| Channel | **POLENET Science** — `https://www.youtube.com/@polenetscience` |
+| Channel ID | `UC_rZ7us194LIZ4PF3GaiiJQ` |
+| Count | 35 |
+| Visibility | **Unlisted** (5 of them are Shorts, being under ~60s) |
+| Appear on | 3 pages only — the 2023-2024, 2024-2025 and 2025-2026 field-season progress pages |
 
-`video_url_map.json` maps **original filename → video URL**, and the build injects an embed
-wherever `video_placements.json` says one belongs. The build does not care *which* channel a URL
-points at, and it never validates URLs at build time.
+The video files themselves are **not** in this repository — they are large, and the site embeds
+them from YouTube rather than serving them. The originals live outside the repo in
+`archive/images/videos/` on the maintainer's machine.
 
-**So a half-migrated map is a completely valid map.** Batches can be migrated, committed and
-deployed independently — there is no flag day, no all-or-nothing cutover, and no state held
-anywhere except that one JSON file. Stopping halfway leaves a working site.
+### How they were uploaded
 
-### Batches
+Briefly, for the record:
 
-They group naturally by the page they appear on, which also makes each batch independently
-verifiable:
+1. Uploaded to the channel through YouTube Studio in four batches over one session.
+2. Titles were left as the original filenames. YouTube tidies these automatically — it strips
+   the extension and turns `_`, `-` and `.` into spaces — so `Digging-out-MCRG-seismic.mov`
+   became `Digging out MCRG seismic`. That transformation is reversible and produced no
+   ambiguity across all 35 names, which is how each video was matched back to the right page.
+3. Each upload was finished through the wizard (an unfinished upload sits as a **Draft** and has
+   no visibility and no shareable link), and set to **Unlisted** on the last step.
+4. The resulting links were fed into `archive/xml/video_url_map.json`, and the site rebuilt.
 
-| Batch | Page | Videos | Size |
-|---|---|---|---|
-| A | `2023-2024-field-season-progress` | 5 | 48.5 MB |
-| B | `2024-2025-field-season-progress` | 8 | 144.4 MB |
-| C | `2025-2026-field-season-progress-page` | 22 | 387.0 MB |
-| | **Total** | **35** | **~580 MB** |
+### Why Unlisted rather than Public
 
-Start with A. It is the smallest, and it exercises every step of the process end to end before
-any real time goes into uploading.
+Public and Unlisted behave **identically** when embedded on the website. The only difference is
+discoverability on YouTube itself: Unlisted videos do not appear on the channel's Videos tab, in
+YouTube search, in recommendations, or in subscriber notifications.
 
-Largest single files, worth knowing for upload time: `polenet_UG_film_4k.mp4` (89.5 MB),
-`New-Year-Arrives_Eric_125.mp4` (80.8 MB), `film_festival_mod17.mp4` (72.8 MB).
+These 35 are raw field clips — a few seconds of blowing snow, someone digging out a sensor. The
+channel also carries a curated, produced series. Publishing 35 unedited clips would bury that
+series under raw footage, and the five that became Shorts would be pushed into YouTube's Shorts
+feed for algorithmic distribution, stripped of the captions that give them meaning.
 
-### The loop, per batch
+**Unlisted is not privacy.** Anyone with the link can watch without signing in, and the links are
+in the public HTML of three pages. It is a presentation choice about the channel, nothing more.
 
-**Yours:**
-1. Bulk-upload the batch from `archive/images/videos/` via YouTube Studio.
-2. **Leave each title exactly the original filename, extension included.** Title text is the
-   only thing matching keys on. See "renaming" below — this is temporary.
-3. Set visibility **Unlisted**.
-4. **Check the Shorts tab afterwards.** Clips under ~60s are auto-routed there and will not
-   appear under Videos. This caught the project out once already.
-5. Send the links back — bare URLs, any order, no labels needed.
+### For the team — what is safe to change
 
-**Mine:**
-6. Confirm `video_url_map.personal-backup.json` is still current before touching anything.
-7. Fetch each video page individually — `https://www.youtube.com/watch?v={id}`, ~2s apart. **Do
-   not** poll the channel or playlist listing; it rate-limits after 2–3 requests.
-8. Read the real `<title>` and the `playabilityStatus`/`isPrivate` fields from the embedded
-   `ytInitialPlayerResponse` JSON. Match title → filename key. Cross-check for duplicate video
-   IDs, both within the batch and against entries already mapped.
-9. Overwrite only that batch's entries in `video_url_map.json`.
-10. Rebuild and verify the per-page embed counts still read 5 / 8 / 22 (total 35), with 0
-    missing images and 0 dead internal links.
-11. Commit, push to `dev`, check the preview, then merge to `main`.
+**Safe. Changes nothing on the website:**
 
-### Visibility: Unlisted, deliberately
+- Switching any or all videos from Unlisted to **Public**, or back. No rebuild, no developer
+  involvement, no change to the site at all. If the team would rather this footage were
+  discoverable on YouTube, that is a bulk edit in Studio and nothing else.
+- **Renaming** videos, adding descriptions, thumbnails, chapters, captions. The website
+  references videos by ID, not by title, so titles can be tidied up freely — and several would
+  benefit (`lucas marathion` is misspelled; `IMG 6226` was never named).
+- Adding them to playlists.
 
-The channel's existing videos are Public, but these 35 should not be. They are raw field clips
-that exist to be embedded in three pages — publishing them would push 35 unedited files onto the
-channel's Videos tab and bury the curated series already there. Unlisted affects only browsing
-and search; embedded playback is identical.
+**Breaks the website. Avoid, or tell the developer:**
 
-### Renaming, after the fact
+- Setting a video to **Private** — the page shows "Video unavailable" instead of playing. This is
+  the dangerous one, because Private sits directly next to Unlisted in the same dropdown.
+- **Deleting** a video.
+- **Deleting and re-uploading** a video, even the identical file with the identical name. A
+  re-upload gets a **new ID**, and the old one stored by the site is now dead. This is the
+  subtle one — it looks like nothing happened, and the broken page would not be noticed unless
+  someone looked at it.
+- A **copyright block** escalating. `film festival mod17` already carries a partial block, so it
+  cannot be played in some countries.
 
-Filenames-as-titles is required only at the moment the links are captured. The map stores URLs,
-not titles, so **renaming the videos to human-readable titles afterwards breaks nothing.** Do the
-whole migration first, then rename at leisure.
+The rule of thumb: **changing a video's visibility or details is safe; changing whether it exists
+is not.**
 
-### Rollback
+### For a developer — the mechanism
 
-If official-channel URLs turn out to be broken or restricted, restore `video_url_map.json` from
-`video_url_map.personal-backup.json`, rebuild, commit, push. That returns the site to the
-previously verified, known-working URLs while the problem is sorted out.
+`archive/xml/video_url_map.json` maps **original filename → video URL**. During the build,
+`build_site.py` looks the filename up, extracts the 11-character YouTube ID from whatever URL
+form it finds (`youtu.be/`, `watch?v=`, `embed/` and `shorts/` are all accepted, query strings
+ignored), and emits an `<iframe>` pointing at `youtube.com/embed/<id>`.
 
-**Why a backup file rather than runtime fallback:** `build_site.py` does not verify video URLs at
-build time and should not — that would put a network dependency, and a rate-limited one, into
-every build. A static file that can be restored by hand is simpler and cannot fail silently.
+Consequences worth knowing:
 
-### When all three batches are done
+- **The build has no concept of an account.** The 35 could come from 35 different channels and
+  nothing would behave differently. A partial migration is therefore always a valid state.
+- **It must be YouTube.** The ID extractor only understands YouTube URL shapes and the output
+  template hardcodes `youtube.com/embed/`. A Vimeo or university-hosted URL would be **silently
+  ignored** and the video would simply vanish from the page — no error. Relevant if the site
+  ever moves to hosting that prefers its own video platform.
+- **The build never checks that a URL still works.** That is deliberate — it would put a
+  rate-limited network dependency into every build. Breakage is therefore silent, which is why
+  the "safe to change" list above matters.
 
-- Rename titles on the channel if wanted (see above).
-- Decide what happens to the previous copies. Leaving them costs nothing; removing them is
-  cleaner. Either way, do it only after all 35 are verified live from the new source.
-- Update the STATUS block in `AGENTS.md` and `docs/todo.md` to close the item.
+**To replace a video:** put the new URL against the right filename key in `video_url_map.json`,
+run `uv run python scraper/build_site.py`, and commit the map plus the three regenerated pages.
 
-### Verification commands
+**Rollback:** `archive/xml/video_url_map.personal-backup.json` holds the previous, verified URL
+set from before the 2026-08-17 migration. Restoring it and rebuilding returns the site to the
+earlier hosting. Keep it until the current videos have been confirmed playing on the live site
+for a while.
+
+### Verification after any video change
 
 ```bash
 uv run python scraper/build_site.py
@@ -181,6 +188,4 @@ for p in 2023-2024-field-season-progress 2024-2025-field-season-progress \
          2025-2026-field-season-progress-page; do
   printf "%s %s\n" "$(grep -c wp-block-embed-youtube site/$p.html)" "$p"
 done            # must read 5, 8, 22
-python3 -c "import json; m=json.load(open('archive/xml/video_url_map.json')); \
-  print(sum(1 for v in m.values() if v), 'of', len(m), 'mapped')"
 ```
