@@ -183,9 +183,7 @@ Two things made that migration cheap, and both were design decisions taken earli
 luck. The map is keyed by filename and the build extracts the video ID from whatever URL form it
 finds, so **a half-migrated map is a valid map** — the batches could be verified and deployed
 independently, with no cutover moment. And because the build never validates URLs, nothing had to
-be coordinated with YouTube at build time. The previous URL set was kept intact as
-`video_url_map.personal-backup.json`, making the whole change reversible with one file copy and a
-rebuild.
+be coordinated with YouTube at build time.
 
 One wrinkle worth recording: YouTube rewrites uploaded titles, stripping extensions and turning
 `_`, `-` and `.` into spaces. Matching returned links back to source files therefore normalises
