@@ -62,7 +62,7 @@ If `archive/images/` is absent, the builder says so and carries on using the com
 ```
 uv run python scraper/build_site.py     # regenerate site/
 git add site/ && git commit
-git push origin dev                     # Netlify deploys the preview
+git push origin dev                     # then promote to main when ready
 ```
 
 Promotion from `dev` to `main` — which is what GitHub Pages serves — is a separate, deliberate

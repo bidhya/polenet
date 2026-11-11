@@ -1,6 +1,6 @@
 # Deployment Plan — polenet.org
 
-Last updated: 2026-08-19
+Last updated: 2026-11-11
 
 ---
 
@@ -8,20 +8,10 @@ Last updated: 2026-08-19
 
 | Decision | Choice | Reason |
 |---|---|---|
-| Hosting | Netlify (free tier) **and** GitHub Pages | Two independent free hosts — see "Two hosts" below |
+| Hosting | GitHub Pages | Free for public repos; tied to the repository, so it travels with it |
 | Repo | GitHub, single monorepo, public since 2026-07-28 | scraper + site in one place |
-| Privacy during prototype | Option B — main branch Netlify deploy paused | Hard separation; flip to live only when ready |
-| Branches | `dev` (Netlify preview) → `main` (GitHub Pages + production) | Two-tier model, see below (simplified from three tiers on 2026-08-12) |
+| Branches | `dev` (development) → `main` (GitHub Pages, production) | Two-tier model, see below (simplified from three tiers on 2026-08-12) |
 | Build | Pre-built static HTML, no build command | site/ is already generated output |
-
-### Two hosts, deliberately
-
-Netlify and GitHub Pages serve the same `site/` output independently. Established 2026-07-28,
-because GitHub Pages became viable once the repo went public (free for any public repo) — a
-genuine second free host, not just a backup. GitHub Actions minutes are free/unlimited for
-public repos, so there's no cost concern on that side; Netlify's are metered, which is the
-whole reason the branch model below routes GitHub Pages traffic through `main` and keeps
-`dev` as the one branch that pushes freely.
 
 ---
 
@@ -32,7 +22,7 @@ polenet/                   ← repo root
 ├── docs/                   ← published docs (handover, report, deployment, notes)
 ├── Scratch/                ← gitignored, local-only (WordPress XML export)
 ├── scraper/                ← Python scripts — committed
-├── site/                   ← the deployable site — committed, Netlify publishes this
+├── site/                   ← the deployable site — committed, published as-is
 │   ├── index.html
 │   ├── css/style.css
 │   ├── images/             ← 539 images/PDFs (videos hosted on YouTube, not committed as files)
@@ -60,8 +50,8 @@ polenet/                   ← repo root
 
 | Branch | Auto-deploys? | Where | Notes |
 |---|---|---|---|
-| `dev` | Yes | `monumental-dieffenbachia-d72518.netlify.app` (Netlify) | Active development — push freely |
-| `main` | Yes (GitHub Pages) / Paused (Netlify) | `bidhya.github.io/polenet` (GitHub Pages, via `.github/workflows/pages.yml`) and `polenet.org` (future) | Merge from `dev` once it looks stable — production track |
+| `dev` | No | — | Active development — push freely |
+| `main` | Yes (GitHub Pages) | `bidhya.github.io/polenet` (GitHub Pages, via `.github/workflows/pages.yml`) and `polenet.org` (future) | Merge from `dev` once it looks stable — production track |
 
 **Promotion checklist**, run before merging `dev` → `main` (this is what's actually been
 checked before every promotion so far, not just aspirational): 0 missing images/PDFs (verified
@@ -72,28 +62,20 @@ HTTP 200 on the page's own URL, since that alone doesn't confirm *that page's* a
 "GitHub Pages setup" below) went unnoticed until manually checking rendered pages.
 
 Workflow:
-1. Make changes on `dev`, push freely — Netlify auto-deploys the preview
-2. Review at `https://monumental-dieffenbachia-d72518.netlify.app/`
+1. Make changes on `dev`, push freely
+2. Review locally — open `site/index.html` in a browser
 3. When `dev` looks stable: `git checkout main && git merge dev --ff-only && git push origin main`
-4. GitHub Actions auto-deploys `main` → `https://bidhya.github.io/polenet/` (Netlify's `main`
-   context stays paused — not connected to a live domain yet)
+4. GitHub Actions auto-deploys `main` → `https://bidhya.github.io/polenet/` — but only when the
+   merge changed something under `site/`. To redeploy by hand, use "Run workflow" on the
+   "Deploy site/ to GitHub Pages" action
 
 ---
 
 ## Key config files
 
 ### netlify.toml
-```toml
-[build]
-  publish = "site"
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- site/"
-
-[context.dev]
-  publish = "site"
-```
-The `ignore` line skips a deploy entirely if `site/` didn't change in the pushed commits —
-a safety net against wasting build minutes on doc-only or scraper-only commits, but not a
-substitute for batching pushes — related commits are best pushed together.
+Optional — only relevant to anyone who hosts the site on Netlify. It publishes `site/` and skips
+a deploy when `site/` is unchanged. It has no effect on GitHub Pages.
 
 ### GitHub Pages setup
 
@@ -144,12 +126,12 @@ Read the file itself rather than a copy here, but two lines are non-obvious:
 
 ---
 
-## Still open — neither item is scheduled
+## Still open — not scheduled
 
 - [ ] **Connect the polenet.org custom domain.** *Which host* is settled: **GitHub Pages**,
       decided 2026-08-14, on handover grounds rather than technical merit — Pages is tied to the
-      repository and travels with it, whereas the Netlify deployment is tied to an individual's
-      personal account.
+      repository and travels with it, whereas a host on someone's personal account does
+      not.
 
       Three things to know if it ever happens. The DNS change is **not self-service for this
       domain** — it goes through the organisation that administers it, on their timescale, so
@@ -160,17 +142,16 @@ Read the file itself rather than a copy here, but two lines are non-obvious:
 
       Verified: the site needs **no changes** to serve from a domain root — 0 root-relative
       links. The step-by-step plan and the request itself are in the project's internal notes.
-- [ ] **Unpause Netlify's `main` context** — moot if the domain move ever happens. A fallback.
 
-> Nobody has asked for either, and nothing depends on them: the site is live and working at
+> Nobody has asked for it, and nothing depends on it: the site is live and working at
 > `bidhya.github.io/polenet/` regardless. Recorded so the reasoning is not lost, not because
-> they are queued.
+> it is queued.
 
 ## Future reference — how to update the site
 
 1. Run `uv run python scraper/build_site.py` if content changes
 2. `git add site/` and commit on `dev` (not `main` directly — see Branch strategy above)
-3. Push `dev` → Netlify auto-deploys the preview; review there
+3. Push `dev`; review locally
 4. When `dev` looks stable: `git checkout main && git merge dev --ff-only && git push origin main`
    → GitHub Actions auto-deploys `main` to `bidhya.github.io/polenet`; review there
 

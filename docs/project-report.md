@@ -300,19 +300,18 @@ build locally  →  commit site/  →  push  →  host serves it
 ```
 
 `site/` is generated on a workstation and **committed as finished HTML**. Git stores output,
-not a recipe. Neither host builds anything — the GitHub Actions workflow uploads the committed
-folder as an artifact, and Netlify publishes it with no build command. There is no Python in
-CI anywhere.
+not a recipe. The host builds nothing — the GitHub Actions workflow uploads the committed folder as an
+artifact. There is no Python in CI anywhere.
 
 The practical consequence: **changing the generator alone changes nothing live.** The build has
-to be re-run and its output committed. Netlify will in fact skip the deploy entirely if `site/`
-is unchanged.
+to be re-run and its output committed. GitHub Pages in fact only redeploys when a push to `main`
+changes `site/`.
 
 The tradeoff is a large repository — roughly 600 MB, almost entirely committed media — in
 exchange for a deployment with no moving parts, reproducible by pointing any static host at a
 folder. For a site whose predecessor died of moving parts, that was the right trade.
 
-**Branching:** `dev` (Netlify preview) → `main` (GitHub Pages, production track). A third
+**Branching:** `dev` (development) → `main` (GitHub Pages, production track). A third
 branch was used temporarily during host setup and retired once the site stabilized.
 
 ---

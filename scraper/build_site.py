@@ -8,7 +8,7 @@ Reads from:
   archive/audit/    — site_index.json (station metadata)
 
 Outputs:
-  site/             — full static site ready for Netlify
+  site/             — full static site, ready for any static host
 
 Usage:
   python build_site.py

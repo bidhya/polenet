@@ -63,8 +63,7 @@ Afterwards `git status` should be clean, since the rebuild is byte-identical.
 
 ## Live
 
-- **Production:** https://bidhya.github.io/polenet/ — GitHub Pages, deployed from `main`
-- **Preview:** https://monumental-dieffenbachia-d72518.netlify.app/ — Netlify, from `dev`
+- https://bidhya.github.io/polenet/ — GitHub Pages, deployed from `main`
 
 Note that `sitemap.xml` and `robots.txt` contain absolute URLs, generated from the
 `SITE_BASE_URL` constant in `scraper/build_site.py`. If the site ever moves to another domain,

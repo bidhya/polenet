@@ -2,9 +2,7 @@
 
 A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar Earth Observing Network). The original WordPress site's theme broke in early 2026 with no easy recourse; this rebuild — done with heavy use of AI-assisted tooling — moves the site off WordPress entirely rather than patch the old theme. Built from a WordPress XML export plus the Internet Archive (Wayback Machine).
 
-**Live previews:**
-- GitHub Pages (`main` branch): https://bidhya.github.io/polenet/
-- Netlify (`dev` branch): https://monumental-dieffenbachia-d72518.netlify.app/
+**Live site:** https://bidhya.github.io/polenet/ (GitHub Pages, deployed from `main`)
 
 ---
 
@@ -36,16 +34,15 @@ A clean static HTML/CSS rebuild of [polenet.org](https://polenet.org) (The Polar
 ## How this works
 
 `site/` is generated **locally** and committed as finished HTML — git stores the output, not a
-recipe. Neither host builds anything: the GitHub Actions workflow and Netlify both just serve the
-committed `site/` folder verbatim (no build command, no Python in CI).
+recipe. The host builds nothing: the GitHub Actions workflow just serves the committed `site/`
+folder verbatim (no build command, no Python in CI).
 
 ```
 build locally  →  commit site/  →  push  →  host serves it
 ```
 
 **Consequence worth knowing:** editing `scraper/build_site.py` alone changes nothing live. You have
-to re-run the build and commit the resulting `site/` diff. Push the Python by itself and Netlify
-skips the deploy outright — its `ignore` rule sees `site/` unchanged.
+to re-run the build and commit the resulting `site/` diff.
 
 This is also why `site/` works as a standalone handover: it's the finished artifact, not an
 intermediate. Point any static host at it and you're done.
@@ -57,17 +54,15 @@ intermediate. Point any static host at it and you're done.
 ### View or deploy the site
 The `site/` directory is self-contained static HTML — open `site/index.html` in a browser or point any static host at it.
 
-Netlify is configured via `netlify.toml` to publish from `site/`.
-
 ### Make a content change
 ```bash
 # Edit scraper/build_site.py, then:
 uv run python scraper/build_site.py      # regenerate site/
 git add site/
 git commit -m "your change"
-git push origin dev             # Netlify auto-deploys the preview
+git push origin dev
 ```
-Once it looks good there, promote it:
+Check it locally (open `site/index.html`), then promote it:
 ```bash
 git checkout main && git merge dev --ff-only && git push origin main
 # GitHub Actions auto-deploys to bidhya.github.io/polenet
@@ -109,8 +104,12 @@ Two-tier model — work flows one direction: `dev` → `main`.
 
 | Branch | Purpose |
 |--------|---------|
-| `dev` | Active development — push here, auto-deploys to Netlify preview |
+| `dev` | Active development — check changes here before promoting |
 | `main` | Merge from `dev` once it looks stable — auto-deploys to GitHub Pages, production track |
+
+GitHub Pages redeploys only when a push to `main` changes something under `site/`; a docs-only
+merge leaves the live site as it was. To redeploy by hand, run the "Deploy site/ to GitHub Pages"
+workflow from the repository's Actions tab.
 
 ---
 
